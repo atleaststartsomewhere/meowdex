@@ -1,0 +1,319 @@
+@using Meowdex.App.Models
+@using Meowdex.App.Services
+@inject CatRosterService RosterService
+
+@page "/manage-cats"
+
+<PageTitle>Manage Cats</PageTitle>
+
+<div class="hero">
+    <h1>Manage Cats</h1>
+    <p>Add, find, edit, and remove cat entries.</p>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(_status))
+{
+    <div class="status">@_status</div>
+}
+
+<div class="grid">
+    <section class="panel">
+        <h2>Add Cat</h2>
+
+        <EditForm Model="_draft" OnValidSubmit="AddCatAsync">
+            <div class="form-grid">
+                <label>
+                    Name
+                    <InputText class="form-control" @bind-Value="_draft.Name" />
+                </label>
+
+                <label>
+                    Gender
+                    <InputSelect class="form-control" @bind-Value="_draft.Gender">
+                        @foreach (var value in Enum.GetValues<CatGender>())
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    </InputSelect>
+                </label>
+
+                <label>
+                    Sexuality
+                    <InputSelect class="form-control" @bind-Value="_draft.Sexuality">
+                        @foreach (var value in Enum.GetValues<CatSexuality>())
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    </InputSelect>
+                </label>
+                <label>
+                    <span>Retired</span>
+                    <InputCheckbox class="form-check-input" @bind-Value="_draft.IsRetired" />
+                </label>
+
+                <label class="wide">
+                    Notes
+                    <InputTextArea class="form-control" @bind-Value="_draft.Notes" />
+                </label>
+            </div>
+
+            <table class="table table-sm stat-table">
+                <thead>
+                    <tr>
+                        <th>Stat</th>
+                        <th>Current</th>
+                        <th>Base (0-7)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Strength</td><td><InputNumber class="form-control" @bind-Value="_draft.StrengthCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_draft.StrengthBase" /></td></tr>
+                    <tr><td>Dexterity</td><td><InputNumber class="form-control" @bind-Value="_draft.DexterityCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_draft.DexterityBase" /></td></tr>
+                    <tr><td>Stamina</td><td><InputNumber class="form-control" @bind-Value="_draft.StaminaCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_draft.StaminaBase" /></td></tr>
+                    <tr><td>Intellect</td><td><InputNumber class="form-control" @bind-Value="_draft.IntellectCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_draft.IntellectBase" /></td></tr>
+                    <tr><td>Speed</td><td><InputNumber class="form-control" @bind-Value="_draft.SpeedCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_draft.SpeedBase" /></td></tr>
+                    <tr><td>Charisma</td><td><InputNumber class="form-control" @bind-Value="_draft.CharismaCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_draft.CharismaBase" /></td></tr>
+                    <tr><td>Luck</td><td><InputNumber class="form-control" @bind-Value="_draft.LuckCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_draft.LuckBase" /></td></tr>
+                </tbody>
+            </table>
+
+            <div class="row-actions">
+                <button type="button" class="btn btn-outline-secondary" @onclick="() => SyncCurrentToBase(_draft)">Current = Base</button>
+                <button class="btn btn-primary" type="submit" disabled="@string.IsNullOrWhiteSpace(_draft.Name)">Add Cat</button>
+            </div>
+        </EditForm>
+    </section>
+
+    <section class="panel">
+        <h2>Lookup + Roster</h2>
+
+        <label>
+            Lookup Cat ID
+            <InputNumber class="form-control" @bind-Value="_lookupId" />
+        </label>
+        <button class="btn btn-outline-dark mt-2" @onclick="LookupCatAsync">Load Cat</button>
+
+        <h3 class="mt-3">Roster (@_cats.Count)</h3>
+        @if (_cats.Count == 0)
+        {
+            <p>No cats yet.</p>
+        }
+        else
+        {
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Mask</th>
+                        <th>B Avg</th>
+                        <th>C Avg</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cat in _cats)
+                    {
+                        <tr>
+                            <td>@cat.Id</td>
+                            <td>
+                                @cat.Name
+                                @if (cat.IsRetired)
+                                {
+                                    <span class="retired-crown" title="Retired">&#9813;</span>
+                                }
+                            </td>
+                            <td><code>@BreedingAdvisorService.FormatMask(cat.SevenMask)</code></td>
+                            <td>@cat.BaseAverage.ToString("F2")</td>
+                            <td>@cat.CurrentAverage.ToString("F2")</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="() => StartEdit(cat)">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteCatAsync(cat.Id)">Remove</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+
+    @if (_editDraft is not null)
+    {
+        <section class="panel wide-panel">
+            <h2>Edit Cat #@_editDraft.Id</h2>
+
+            <EditForm Model="_editDraft" OnValidSubmit="SaveEditAsync">
+                <div class="form-grid">
+                    <label>
+                        Name
+                        <InputText class="form-control" @bind-Value="_editDraft.Name" />
+                    </label>
+
+                    <label>
+                        Gender
+                        <InputSelect class="form-control" @bind-Value="_editDraft.Gender">
+                            @foreach (var value in Enum.GetValues<CatGender>())
+                            {
+                                <option value="@value">@value</option>
+                            }
+                        </InputSelect>
+                    </label>
+
+                    <label>
+                        Sexuality
+                        <InputSelect class="form-control" @bind-Value="_editDraft.Sexuality">
+                            @foreach (var value in Enum.GetValues<CatSexuality>())
+                            {
+                                <option value="@value">@value</option>
+                            }
+                        </InputSelect>
+                    </label>
+                    <label>
+                        <span>Retired</span>
+                        <InputCheckbox class="form-check-input" @bind-Value="_editDraft.IsRetired" />
+                    </label>
+
+                    <label class="wide">
+                        Notes
+                        <InputTextArea class="form-control" @bind-Value="_editDraft.Notes" />
+                    </label>
+                </div>
+
+                <table class="table table-sm stat-table">
+                    <thead>
+                        <tr>
+                            <th>Stat</th>
+                            <th>Current</th>
+                            <th>Base</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Strength</td><td><InputNumber class="form-control" @bind-Value="_editDraft.StrengthCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_editDraft.StrengthBase" /></td></tr>
+                        <tr><td>Dexterity</td><td><InputNumber class="form-control" @bind-Value="_editDraft.DexterityCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_editDraft.DexterityBase" /></td></tr>
+                        <tr><td>Stamina</td><td><InputNumber class="form-control" @bind-Value="_editDraft.StaminaCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_editDraft.StaminaBase" /></td></tr>
+                        <tr><td>Intellect</td><td><InputNumber class="form-control" @bind-Value="_editDraft.IntellectCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_editDraft.IntellectBase" /></td></tr>
+                        <tr><td>Speed</td><td><InputNumber class="form-control" @bind-Value="_editDraft.SpeedCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_editDraft.SpeedBase" /></td></tr>
+                        <tr><td>Charisma</td><td><InputNumber class="form-control" @bind-Value="_editDraft.CharismaCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_editDraft.CharismaBase" /></td></tr>
+                        <tr><td>Luck</td><td><InputNumber class="form-control" @bind-Value="_editDraft.LuckCurrent" /></td><td><InputNumber class="form-control" @bind-Value="_editDraft.LuckBase" /></td></tr>
+                    </tbody>
+                </table>
+
+                <div class="row-actions">
+                    <button type="button" class="btn btn-outline-secondary" @onclick="() => SyncCurrentToBase(_editDraft)">Current = Base</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-outline-dark" @onclick="CancelEdit">Cancel</button>
+                </div>
+            </EditForm>
+        </section>
+    }
+</div>
+
+@code {
+    private CatProfile _draft = NewDraft();
+    private CatProfile? _editDraft;
+    private int _lookupId;
+    private string? _status;
+
+    private List<CatProfile> _cats = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+    }
+
+    private async Task AddCatAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_draft.Name))
+        {
+            return;
+        }
+
+        var created = await RosterService.AddCatAsync(_draft);
+        _status = $"Added cat #{created.Id}: {created.Name}";
+        _draft = NewDraft();
+        await RefreshAsync();
+    }
+
+    private void StartEdit(CatProfile cat)
+    {
+        _editDraft = cat.Clone();
+        _status = $"Editing cat #{cat.Id}";
+    }
+
+    private void CancelEdit()
+    {
+        _editDraft = null;
+        _status = "Edit canceled.";
+    }
+
+    private async Task SaveEditAsync()
+    {
+        if (_editDraft is null)
+        {
+            return;
+        }
+
+        var ok = await RosterService.UpdateCatAsync(_editDraft);
+        _status = ok ? $"Saved cat #{_editDraft.Id}." : $"Cat #{_editDraft.Id} not found.";
+        _editDraft = null;
+        await RefreshAsync();
+    }
+
+    private async Task LookupCatAsync()
+    {
+        if (_lookupId <= 0)
+        {
+            _status = "Enter a positive ID for lookup.";
+            return;
+        }
+
+        var cat = await RosterService.GetByIdAsync(_lookupId);
+        if (cat is null)
+        {
+            _status = $"Cat #{_lookupId} not found.";
+            return;
+        }
+
+        _editDraft = cat;
+        _status = $"Loaded cat #{cat.Id} for editing.";
+    }
+
+    private async Task DeleteCatAsync(int catId)
+    {
+        await RosterService.DeleteCatAsync(catId);
+        if (_editDraft?.Id == catId)
+        {
+            _editDraft = null;
+        }
+
+        _status = $"Removed cat #{catId}.";
+        await RefreshAsync();
+    }
+
+    private async Task RefreshAsync()
+    {
+        _cats = (await RosterService.GetCatsAsync()).OrderByDescending(cat => cat.Id).ToList();
+    }
+
+    private static void SyncCurrentToBase(CatProfile cat)
+    {
+        cat.StrengthCurrent = cat.StrengthBase;
+        cat.DexterityCurrent = cat.DexterityBase;
+        cat.StaminaCurrent = cat.StaminaBase;
+        cat.IntellectCurrent = cat.IntellectBase;
+        cat.SpeedCurrent = cat.SpeedBase;
+        cat.CharismaCurrent = cat.CharismaBase;
+        cat.LuckCurrent = cat.LuckBase;
+    }
+
+    private static CatProfile NewDraft()
+    {
+        var cat = new CatProfile
+        {
+            Gender = CatGender.Female,
+            Sexuality = CatSexuality.Bi
+        };
+
+        SyncCurrentToBase(cat);
+        return cat;
+    }
+}

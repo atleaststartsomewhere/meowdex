@@ -1,0 +1,364 @@
+@using Meowdex.App.Models
+@using Meowdex.App.Services
+@inject CatRosterService RosterService
+@inject BreedingAdvisorService Advisor
+@inject NavigationManager Nav
+
+@page "/"
+
+<PageTitle>Mewgenics Dashboard</PageTitle>
+
+<div class="hero">
+    <h1>Mewgenics Dashboard</h1>
+    <p>Configure recommendation settings and review the latest breeding plan.</p>
+</div>
+
+<div class="actions-row">
+    <button class="btn btn-primary" @onclick="GoToManageCats">Manage Cats</button>
+    <button class="btn btn-outline-secondary" @onclick="GoToMigrationPage">Open V2 Migration Tool</button>
+</div>
+
+<div class="grid">
+    <section class="panel">
+        <h2>Config</h2>
+        <label>
+            Top Cat Count (default 3)
+            <InputNumber class="form-control" @bind-Value="_topCatCount" />
+        </label>
+        <label class="mt-2">
+            Desired Backfills Per Mask
+            <InputNumber class="form-control" @bind-Value="_backfillsPerMask" />
+        </label>
+        <label class="mt-2">
+            Exclude Masks With Less Than N 7s
+            <InputNumber class="form-control" @bind-Value="_minMaskSevenCount" />
+        </label>
+        <button class="btn btn-outline-primary mt-2" @onclick="RebuildPlan">Recompute Plan</button>
+    </section>
+
+    <section class="panel">
+        <h2>Snapshot</h2>
+        <ul>
+            <li>Total cats: @_cats.Count</li>
+            <li>Retired cats: @_cats.Count(c => c.IsRetired)</li>
+            <li>Cats with natural base 7: @_cats.Count(c => c.HasNaturalSeven)</li>
+            <li>Breeding pool size: @_plan.BreedingPool.Count</li>
+            <li>General population size: @_plan.GeneralPopulation.Count</li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <h2>Next Adventuring Team</h2>
+
+        <div class="form-check">
+            <input id="teamAuto" class="form-check-input" type="checkbox" checked="@_teamAutoEnabled" @onchange="OnTeamAutoChanged" />
+            <label for="teamAuto" class="form-check-label">AUTO ON</label>
+        </div>
+
+        <table class="table table-sm align-middle mt-2">
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Stat Priority</th>
+                    <th>Cat</th>
+                    <th>Score</th>
+                    <th>C Avg</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var row = 0; row < 4; row++)
+                {
+                    var rowIndex = row;
+                    <tr>
+                        <td>#@(row + 1)</td>
+                        <td>
+                            <select class="form-control"
+                                    value="@_rowPriorities[rowIndex]"
+                                    @onchange="e => OnRowPriorityChanged(rowIndex, e)"
+                                    disabled="@_teamAutoEnabled">
+                                @foreach (var choice in Enum.GetValues<RowStatChoice>())
+                                {
+                                    <option value="@choice">@RowChoiceLabel(choice)</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            @if (_adventuringTeam.Count > rowIndex && _adventuringTeam[rowIndex].Cat is not null)
+                            {
+                                <span>#@_adventuringTeam[rowIndex].Cat!.Id @_adventuringTeam[rowIndex].Cat!.Name</span>
+                            }
+                            else
+                            {
+                                <span>None</span>
+                            }
+                        </td>
+                        <td>@(_adventuringTeam.Count > rowIndex ? _adventuringTeam[rowIndex].Score.ToString("F2") : "0.00")</td>
+                        <td>@(_adventuringTeam.Count > rowIndex && _adventuringTeam[rowIndex].Cat is not null ? _adventuringTeam[rowIndex].Cat!.CurrentAverage.ToString("F2") : "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <p class="mt-2">Team excludes breeders and retired cats.</p>
+    </section>
+
+    <section class="panel wide-panel">
+        <h2>Breeding Plan</h2>
+
+        <p>
+            Selected top cats: @_plan.TopCats.Count / @_plan.TopCatCount
+            <br />
+            Backfills per mask: @_plan.BackfillsPerMask
+            <br />
+            Minimum 7s per mask: @_minMaskSevenCount
+            <br />
+            Covered 7-mask: <code>@BreedingAdvisorService.FormatMask(_plan.CoveredMask)</code>
+        </p>
+
+        <h3>Breeding Pool</h3>
+        @if (_plan.BreedingPool.Count == 0)
+        {
+            <p>No breeding candidates yet. Add non-retired cats with at least one base 7.</p>
+        }
+        else
+        {
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Mask</th>
+                        <th>#7s</th>
+                        <th>Partners</th>
+                        <th>B Avg</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entry in _plan.BreedingPool)
+                    {
+                        <tr>
+                            <td>@entry.Cat.Id</td>
+                            <td>@entry.Cat.Name</td>
+                            <td><code>@entry.SevenMask</code></td>
+                            <td>@entry.Cat.BaseSevenCount</td>
+                            <td>@entry.CompatiblePartners</td>
+                            <td>@entry.Cat.BaseAverage.ToString("F2")</td>
+                            <td>@entry.Reason</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <h3>Diversity Backfill</h3>
+        @if (_plan.AdditionalDiversityCats.Count == 0)
+        {
+            <p>No additional complementary masks needed.</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var cat in _plan.AdditionalDiversityCats)
+                {
+                    <li>#@cat.Id @cat.Name (<code>@BreedingAdvisorService.FormatMask(cat.SevenMask)</code>)</li>
+                }
+            </ul>
+        }
+
+        <h3>General Population</h3>
+        @if (_plan.GeneralPopulation.Count == 0)
+        {
+            <p>No cats in general population.</p>
+        }
+        else
+        {
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>C Avg</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entry in _plan.GeneralPopulation)
+                    {
+                        <tr>
+                            <td>@entry.Cat.Id</td>
+                            <td>
+                                @entry.Cat.Name
+                                @if (entry.Cat.IsRetired)
+                                {
+                                    <span class="retired-crown" title="Retired">&#9813;</span>
+                                }
+                            </td>
+                            <td>@entry.Cat.CurrentAverage.ToString("F2")</td>
+                            <td>@entry.Reason</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+</div>
+
+@code {
+    private int _topCatCount = 3;
+    private int _backfillsPerMask = 1;
+    private int _minMaskSevenCount;
+
+    private bool _teamAutoEnabled = true;
+    private readonly RowStatChoice[] _rowPriorities = [RowStatChoice.None, RowStatChoice.None, RowStatChoice.None, RowStatChoice.None];
+
+    private List<CatProfile> _cats = [];
+    private BreedingPlanResult _plan = new(3, 1, [], [], [], [], 0);
+    private List<AdventuringSlot> _adventuringTeam = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+    }
+
+    private void RebuildPlan()
+    {
+        _topCatCount = Math.Max(1, _topCatCount);
+        _backfillsPerMask = Math.Max(0, _backfillsPerMask);
+        _minMaskSevenCount = Math.Max(0, _minMaskSevenCount);
+
+        _plan = Advisor.BuildPlan(_cats, new BreedingPlanOptions(_topCatCount, _backfillsPerMask, _minMaskSevenCount));
+        RebuildAdventuringTeam();
+    }
+
+    private async Task RefreshAsync()
+    {
+        _cats = (await RosterService.GetCatsAsync()).OrderByDescending(cat => cat.Id).ToList();
+        _plan = Advisor.BuildPlan(_cats, new BreedingPlanOptions(Math.Max(1, _topCatCount), Math.Max(0, _backfillsPerMask), Math.Max(0, _minMaskSevenCount)));
+        RebuildAdventuringTeam();
+    }
+
+    private void RebuildAdventuringTeam()
+    {
+        var candidates = _plan.GeneralPopulation
+            .Select(entry => entry.Cat)
+            .Where(cat => !cat.IsRetired)
+            .ToList();
+
+        var requests = Enumerable.Range(0, 4)
+            .Select(row => new RowRequest(row, _teamAutoEnabled ? RowStatChoice.None : _rowPriorities[row]))
+            .ToList();
+
+        var usedIds = new HashSet<int>();
+        _adventuringTeam = [];
+
+        foreach (var req in requests)
+        {
+            var candidate = candidates
+                .Where(cat => !usedIds.Contains(cat.Id))
+                .Select(cat => new { Cat = cat, Score = ScoreForChoice(cat, req.Choice) })
+                .OrderByDescending(x => x.Score)
+                .ThenByDescending(x => x.Cat.CurrentAverage)
+                .ThenByDescending(x => x.Cat.Id)
+                .FirstOrDefault();
+
+            if (candidate is null)
+            {
+                _adventuringTeam.Add(new AdventuringSlot(req.Row + 1, req.Choice, null, 0));
+                continue;
+            }
+
+            usedIds.Add(candidate.Cat.Id);
+            _adventuringTeam.Add(new AdventuringSlot(req.Row + 1, req.Choice, candidate.Cat, candidate.Score));
+        }
+    }
+
+    private void OnTeamAutoChanged(ChangeEventArgs args)
+    {
+        _teamAutoEnabled = args.Value switch
+        {
+            bool enabled => enabled,
+            string text when bool.TryParse(text, out var parsed) => parsed,
+            _ => false
+        };
+        if (_teamAutoEnabled)
+        {
+            for (var i = 0; i < _rowPriorities.Length; i++)
+            {
+                _rowPriorities[i] = RowStatChoice.None;
+            }
+        }
+
+        RebuildAdventuringTeam();
+    }
+
+    private void OnRowPriorityChanged(int rowIndex, ChangeEventArgs args)
+    {
+        if (args.Value is null)
+        {
+            return;
+        }
+
+        if (Enum.TryParse<RowStatChoice>(args.Value.ToString(), out var parsed))
+        {
+            _rowPriorities[rowIndex] = parsed;
+            RebuildAdventuringTeam();
+        }
+    }
+
+    private static double ScoreForChoice(CatProfile cat, RowStatChoice choice)
+    {
+        return choice switch
+        {
+            RowStatChoice.Strength => cat.StrengthCurrent,
+            RowStatChoice.Dexterity => cat.DexterityCurrent,
+            RowStatChoice.Stamina => cat.StaminaCurrent,
+            RowStatChoice.Intellect => cat.IntellectCurrent,
+            RowStatChoice.Speed => cat.SpeedCurrent,
+            RowStatChoice.Charisma => cat.CharismaCurrent,
+            RowStatChoice.Luck => cat.LuckCurrent,
+            _ => cat.CurrentAverage
+        };
+    }
+
+    private static string RowChoiceLabel(RowStatChoice choice)
+    {
+        return choice switch
+        {
+            RowStatChoice.None => "AUTO",
+            RowStatChoice.Strength => "STR",
+            RowStatChoice.Dexterity => "DEX",
+            RowStatChoice.Stamina => "STA",
+            RowStatChoice.Intellect => "INT",
+            RowStatChoice.Speed => "SPD",
+            RowStatChoice.Charisma => "CHA",
+            RowStatChoice.Luck => "LCK",
+            _ => "AUTO"
+        };
+    }
+
+    private void GoToManageCats()
+    {
+        Nav.NavigateTo("/manage-cats");
+    }
+
+    private void GoToMigrationPage()
+    {
+        Nav.NavigateTo("/migrate-from-v2-spreadsheet");
+    }
+
+    private enum RowStatChoice
+    {
+        None,
+        Strength,
+        Dexterity,
+        Stamina,
+        Intellect,
+        Speed,
+        Charisma,
+        Luck
+    }
+
+    private sealed record RowRequest(int Row, RowStatChoice Choice);
+    private sealed record AdventuringSlot(int Row, RowStatChoice Choice, CatProfile? Cat, double Score);
+}

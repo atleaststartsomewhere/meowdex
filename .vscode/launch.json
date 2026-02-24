@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "configurations": [
+    {
+      "name": "Meowdex: MAUI Windows (Debug)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "maui: build windows debug",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/Meowdex.App/Meowdex.App.csproj",
+        "-f",
+        "net10.0-windows10.0.19041.0"
+      ],
+      "cwd": "${workspaceFolder}/Meowdex.App",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+.hero {
+    margin-bottom: 1rem;
+}
+
+.hero h1 {
+    margin-bottom: 0.35rem;
+}
+
+.status {
+    background: #eef6ff;
+    border: 1px solid #a8c9ee;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.6rem 0.8rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1rem;
+}
+
+.panel {
+    background: #f8f9ff;
+    border: 1px solid #dde3f0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.wide-panel {
+    grid-column: 1 / -1;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.form-grid label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    gap: 0.3rem;
+}
+
+.form-grid .wide {
+    grid-column: 1 / -1;
+}
+
+.lookup {
+    margin-top: 1rem;
+}
+
+.stat-table td,
+.stat-table th {
+    vertical-align: middle;
+}
+
+.row-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.retired-crown {
+    color: #a06a00;
+    margin-left: 0.3rem;
+    font-weight: 700;
+}
+
+@media (max-width: 700px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
