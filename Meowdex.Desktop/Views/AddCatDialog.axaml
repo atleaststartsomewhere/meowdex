@@ -1,0 +1,83 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Meowdex.Desktop.Views.AddCatDialog"
+        Width="820"
+        Height="720"
+        WindowStartupLocation="CenterOwner"
+        Title="Add Cat">
+  <ScrollViewer>
+    <StackPanel Spacing="12" Margin="16">
+      <TextBlock Text="Add Cat" FontSize="20" FontWeight="Bold" />
+
+      <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto">
+        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+          <TextBlock Text="Name" />
+          <TextBox Text="{Binding Cat.Name}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+          <TextBlock Text="Gender" />
+          <ComboBox ItemsSource="{Binding GenderOptions}" SelectedItem="{Binding Cat.Gender}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+          <TextBlock Text="Sexuality" />
+          <ComboBox ItemsSource="{Binding SexualityOptions}" SelectedItem="{Binding Cat.Sexuality}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+          <TextBlock Text="Retired" />
+          <CheckBox IsChecked="{Binding Cat.IsRetired}" Content="Retired" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="6">
+          <TextBlock Text="Notes" />
+          <TextBox Text="{Binding Cat.Notes}" AcceptsReturn="True" Height="80" />
+        </StackPanel>
+      </Grid>
+
+      <TextBlock Text="Stats" FontWeight="SemiBold" />
+      <Grid ColumnDefinitions="2*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Stat" FontWeight="SemiBold" />
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Current" FontWeight="SemiBold" />
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="Base (0-7)" FontWeight="SemiBold" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Strength" />
+        <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding Cat.StrengthCurrent}" Minimum="0" Maximum="99" />
+        <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Cat.StrengthBase}" Minimum="0" Maximum="7" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Dexterity" />
+        <NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding Cat.DexterityCurrent}" Minimum="0" Maximum="99" />
+        <NumericUpDown Grid.Row="2" Grid.Column="2" Value="{Binding Cat.DexterityBase}" Minimum="0" Maximum="7" />
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Stamina" />
+        <NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding Cat.StaminaCurrent}" Minimum="0" Maximum="99" />
+        <NumericUpDown Grid.Row="3" Grid.Column="2" Value="{Binding Cat.StaminaBase}" Minimum="0" Maximum="7" />
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Intellect" />
+        <NumericUpDown Grid.Row="4" Grid.Column="1" Value="{Binding Cat.IntellectCurrent}" Minimum="0" Maximum="99" />
+        <NumericUpDown Grid.Row="4" Grid.Column="2" Value="{Binding Cat.IntellectBase}" Minimum="0" Maximum="7" />
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Speed" />
+        <NumericUpDown Grid.Row="5" Grid.Column="1" Value="{Binding Cat.SpeedCurrent}" Minimum="0" Maximum="99" />
+        <NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding Cat.SpeedBase}" Minimum="0" Maximum="7" />
+
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Charisma" />
+        <NumericUpDown Grid.Row="6" Grid.Column="1" Value="{Binding Cat.CharismaCurrent}" Minimum="0" Maximum="99" />
+        <NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding Cat.CharismaBase}" Minimum="0" Maximum="7" />
+      </Grid>
+
+      <Grid ColumnDefinitions="2*,*,*" RowDefinitions="Auto">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Luck" />
+        <NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding Cat.LuckCurrent}" Minimum="0" Maximum="99" />
+        <NumericUpDown Grid.Row="0" Grid.Column="2" Value="{Binding Cat.LuckBase}" Minimum="0" Maximum="7" />
+      </Grid>
+
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Click="OnSync">Current = Base</Button>
+        <Button Click="OnCancel">Cancel</Button>
+        <Button Classes="primary" Click="OnSave">Add Cat</Button>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</Window>

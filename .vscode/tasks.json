@@ -16,6 +16,17 @@
         "isDefault": true
       },
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "desktop: build debug",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/Meowdex.Desktop/Meowdex.Desktop.csproj"
+      ],
+      "group": "build",
+      "problemMatcher": "$msCompile"
     }
   ]
 }

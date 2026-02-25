@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Meowdex.Desktop.Views.MainWindow"
+        Width="1200"
+        Height="800"
+        MinWidth="960"
+        MinHeight="640"
+        Title="Meowdex">
+  <Grid>
+    <ContentControl Content="{Binding CurrentViewModel}" />
+
+    <Border Classes="overlay-backdrop"
+            Opacity="{Binding OverlayHost.IsOpen, Converter={StaticResource BoolToOpacity}}"
+            IsHitTestVisible="{Binding OverlayHost.IsOpen}">
+      <ContentControl Classes="overlay-content"
+                      Opacity="{Binding OverlayHost.IsOpen, Converter={StaticResource BoolToOpacity}}"
+                      Content="{Binding OverlayHost.Current}" />
+    </Border>
+  </Grid>
+</Window>

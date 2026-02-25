@@ -2,7 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meowdex.App", "Meowdex.App\Meowdex.App.csproj", "{BA0BE303-7B82-BEBF-14C1-665E5D0ACF5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meowdex.Core", "Meowdex.Core\Meowdex.Core.csproj", "{F4A5DCC3-8D35-4B76-A5F1-2F46B2FCE6F1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Meowdex.Desktop", "Meowdex.Desktop\Meowdex.Desktop.csproj", "{C89E1C7E-4E66-4B5C-9C59-357F8E019E86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,10 +12,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BA0BE303-7B82-BEBF-14C1-665E5D0ACF5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA0BE303-7B82-BEBF-14C1-665E5D0ACF5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA0BE303-7B82-BEBF-14C1-665E5D0ACF5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA0BE303-7B82-BEBF-14C1-665E5D0ACF5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4A5DCC3-8D35-4B76-A5F1-2F46B2FCE6F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4A5DCC3-8D35-4B76-A5F1-2F46B2FCE6F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4A5DCC3-8D35-4B76-A5F1-2F46B2FCE6F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4A5DCC3-8D35-4B76-A5F1-2F46B2FCE6F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C89E1C7E-4E66-4B5C-9C59-357F8E019E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C89E1C7E-4E66-4B5C-9C59-357F8E019E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C89E1C7E-4E66-4B5C-9C59-357F8E019E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C89E1C7E-4E66-4B5C-9C59-357F8E019E86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

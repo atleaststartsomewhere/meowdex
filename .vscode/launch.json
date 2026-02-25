@@ -17,6 +17,21 @@
       "cwd": "${workspaceFolder}/Meowdex.App",
       "console": "internalConsole",
       "stopAtEntry": false
+    },
+    {
+      "name": "Meowdex: Desktop (Debug)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "desktop: build debug",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/Meowdex.Desktop/Meowdex.Desktop.csproj"
+      ],
+      "cwd": "${workspaceFolder}/Meowdex.Desktop",
+      "console": "internalConsole",
+      "stopAtEntry": false
     }
   ]
 }

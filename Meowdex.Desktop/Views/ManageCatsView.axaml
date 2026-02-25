@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:badges="clr-namespace:Meowdex.Desktop.Views.Badges"
+             x:Class="Meowdex.Desktop.Views.ManageCatsView"
+             x:Name="Root">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="24">
+    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,8">
+      <TextBlock Text="Manage Cats" FontSize="26" FontWeight="Bold" />
+      <Button Grid.Column="1" Classes="icon-btn" Content="⚙" Click="OnSettings" />
+      <TextBlock Grid.Row="1" Text="Add, find, edit, and remove cat entries." />
+    </Grid>
+
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+      <Button Classes="ghost" Content="Back to Dashboard" Click="OnBack" />
+      <Button Classes="primary" Content="Add Cat" Click="OnAdd" />
+    </StackPanel>
+
+    <TextBlock Grid.Row="2" Text="Roster" FontSize="18" FontWeight="SemiBold" Margin="0,8,0,0" />
+
+    <DataGrid Grid.Row="3"
+              x:Name="RosterGrid"
+              ItemsSource="{Binding Cats}"
+              AutoGenerateColumns="False"
+              CanUserSortColumns="True"
+              SelectionMode="Single"
+              HeadersVisibility="Column"
+              IsReadOnly="True"
+              HorizontalScrollBarVisibility="Auto">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="140" SortMemberPath="Name" />
+        <DataGridTemplateColumn Header="R" Width="80" SortMemberPath="IsRetired">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Border Classes="badge retired" IsVisible="{Binding IsRetired}">
+                <TextBlock Classes="badge-label" Text="R" />
+              </Border>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="G" Width="60">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <badges:GenderBadgeView Gender="{Binding Gender}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="S" Width="70">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <badges:SexualityBadgeView Sexuality="{Binding Sexuality}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Str B" Binding="{Binding StrengthBase}" Width="70" SortMemberPath="StrengthBase" />
+        <DataGridTextColumn Header="Str C" Binding="{Binding StrengthCurrent}" Width="70" SortMemberPath="StrengthCurrent" />
+        <DataGridTextColumn Header="Dex B" Binding="{Binding DexterityBase}" Width="70" SortMemberPath="DexterityBase" />
+        <DataGridTextColumn Header="Dex C" Binding="{Binding DexterityCurrent}" Width="70" SortMemberPath="DexterityCurrent" />
+        <DataGridTextColumn Header="Sta B" Binding="{Binding StaminaBase}" Width="70" SortMemberPath="StaminaBase" />
+        <DataGridTextColumn Header="Sta C" Binding="{Binding StaminaCurrent}" Width="70" SortMemberPath="StaminaCurrent" />
+        <DataGridTextColumn Header="Int B" Binding="{Binding IntellectBase}" Width="70" SortMemberPath="IntellectBase" />
+        <DataGridTextColumn Header="Int C" Binding="{Binding IntellectCurrent}" Width="70" SortMemberPath="IntellectCurrent" />
+        <DataGridTextColumn Header="Spd B" Binding="{Binding SpeedBase}" Width="70" SortMemberPath="SpeedBase" />
+        <DataGridTextColumn Header="Spd C" Binding="{Binding SpeedCurrent}" Width="70" SortMemberPath="SpeedCurrent" />
+        <DataGridTextColumn Header="Cha B" Binding="{Binding CharismaBase}" Width="70" SortMemberPath="CharismaBase" />
+        <DataGridTextColumn Header="Cha C" Binding="{Binding CharismaCurrent}" Width="70" SortMemberPath="CharismaCurrent" />
+        <DataGridTextColumn Header="Lck B" Binding="{Binding LuckBase}" Width="70" SortMemberPath="LuckBase" />
+        <DataGridTextColumn Header="Lck C" Binding="{Binding LuckCurrent}" Width="70" SortMemberPath="LuckCurrent" />
+        <DataGridTextColumn Header="B Avg" Binding="{Binding BaseAverage}" Width="70" SortMemberPath="BaseAverage" />
+        <DataGridTextColumn Header="C Avg" Binding="{Binding CurrentAverage}" Width="70" SortMemberPath="CurrentAverage" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</UserControl>

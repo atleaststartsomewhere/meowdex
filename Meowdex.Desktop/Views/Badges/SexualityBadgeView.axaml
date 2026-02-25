@@ -1,0 +1,10 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Meowdex.Desktop.Views.Badges.SexualityBadgeView">
+  <Border x:Name="Badge"
+          Classes="badge"
+          Padding="6,2"
+          CornerRadius="999">
+    <TextBlock x:Name="Label" Classes="badge-label" />
+  </Border>
+</UserControl>

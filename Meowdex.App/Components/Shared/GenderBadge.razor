@@ -1,0 +1,23 @@
+@using Meowdex.App.Models
+
+<span class="identity-badge gender-badge gender-@Gender.ToString().ToLowerInvariant()"
+      title="Gender: @Gender"
+      aria-label="Gender: @Gender">
+    @GetLabel()
+</span>
+
+@code {
+    [Parameter]
+    public CatGender Gender { get; set; }
+
+    private string GetLabel()
+    {
+        return Gender switch
+        {
+            CatGender.Male => "M",
+            CatGender.Female => "F",
+            CatGender.Fluid => "Fl",
+            _ => "?"
+        };
+    }
+}

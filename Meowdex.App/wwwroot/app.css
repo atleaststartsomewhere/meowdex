@@ -1,5 +1,6 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
 }
 
 a, .btn-link {
@@ -82,6 +83,58 @@ h1:focus {
 
 .status-bar-safe-area {
     display: none;
+}
+
+.identity-badge {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.7rem;
+    font-weight: 700;
+    justify-content: center;
+    min-width: 2.2rem;
+    padding: 0.15rem 0.4rem;
+    text-transform: uppercase;
+}
+
+.gender-badge {
+    background: #e7f0ff;
+    color: #1b4d9b;
+}
+
+.gender-male {
+    background: #e2f4ff;
+    color: #0b4a6f;
+}
+
+.gender-female {
+    background: #ffe6ef;
+    color: #9b1b4c;
+}
+
+.gender-fluid {
+    background: #f5e9ff;
+    color: #5a1b9b;
+}
+
+.sexuality-badge {
+    background: #eef5f3;
+    color: #1a5b45;
+}
+
+.sexuality-bi {
+    background: #efe8ff;
+    color: #4b1b9b;
+}
+
+.sexuality-gaylesbian {
+    background: #e9f7ef;
+    color: #1a6b39;
+}
+
+.sexuality-straight {
+    background: #fff4e0;
+    color: #8a4a0b;
 }
 
 @supports (-webkit-touch-callout: none) {

@@ -1,0 +1,23 @@
+@using Meowdex.App.Models
+
+<span class="identity-badge sexuality-badge sexuality-@Sexuality.ToString().ToLowerInvariant()"
+      title="Sexuality: @Sexuality"
+      aria-label="Sexuality: @Sexuality">
+    @GetLabel()
+</span>
+
+@code {
+    [Parameter]
+    public CatSexuality Sexuality { get; set; }
+
+    private string GetLabel()
+    {
+        return Sexuality switch
+        {
+            CatSexuality.Bi => "Bi",
+            CatSexuality.GayLesbian => "G/L",
+            CatSexuality.Straight => "St",
+            _ => "?"
+        };
+    }
+}

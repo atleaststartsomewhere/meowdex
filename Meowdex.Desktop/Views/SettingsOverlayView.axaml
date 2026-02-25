@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:Meowdex.Desktop.ViewModels"
+             x:Class="Meowdex.Desktop.Views.SettingsOverlayView"
+             x:Name="Root">
+  <Grid>
+    <Border Classes="overlay-panel"
+            Margin="0"
+            Padding="24">
+      <Grid ColumnDefinitions="240,*" RowDefinitions="Auto,* ,Auto">
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+          <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" />
+          <Button Grid.Column="1" Content="✕" Command="{Binding CloseCommand}" />
+        </Grid>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Spacing="8">
+          <ToggleButton Classes="settings-tab"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Configuration, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="Configuration">Configuration</ToggleButton>
+          <ToggleButton Classes="settings-tab"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=ImportData, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="ImportData">Import Data</ToggleButton>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Grid.Column="1">
+          <StackPanel Spacing="12"
+                      IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Configuration}">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Top Cat Count (default 3)" />
+              <NumericUpDown Minimum="1" Maximum="20" Value="{Binding Config.TopCatCount}" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+              <TextBlock Text="Desired Backfills Per Mask" />
+              <NumericUpDown Minimum="0" Maximum="20" Value="{Binding Config.BackfillsPerMask}" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+              <TextBlock Text="Exclude Masks With Less Than N 7s" />
+              <NumericUpDown Minimum="0" Maximum="7" Value="{Binding Config.MinMaskSevenCount}" />
+            </StackPanel>
+          </StackPanel>
+
+          <StackPanel Spacing="10"
+                      IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=ImportData}">
+            <TextBlock Text="Import Data" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="Paste tab-delimited rows copied from Google Sheets. Duplicate rows are ignored." />
+            <TextBox AcceptsReturn="True"
+                     Height="200"
+                     Text="{Binding ImportInput}" />
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+              <Button Content="Run Import"
+                      Classes="primary"
+                      Command="{Binding RunImportCommand}" />
+            </StackPanel>
+
+            <StackPanel IsVisible="{Binding ImportSummary, Converter={StaticResource NullToBool}}" Spacing="8">
+              <TextBlock Text="Import Summary" FontSize="16" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding ImportSummary.TotalLines, StringFormat=Total lines: {0}}" />
+              <TextBlock Text="{Binding ImportSummary.ParsedRows, StringFormat=Parsed rows: {0}}" />
+              <TextBlock Text="{Binding ImportSummary.Imported, StringFormat=Imported: {0}}" />
+              <TextBlock Text="{Binding ImportSummary.SkippedDuplicates, StringFormat=Skipped duplicates: {0}}" />
+              <TextBlock Text="{Binding ImportSummary.Errors.Count, StringFormat=Errors: {0}}" />
+
+              <ItemsControl ItemsSource="{Binding ImportSummary.Errors}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
+          <TextBlock Text="" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Content="Cancel" Command="{Binding CloseCommand}" />
+            <Button Classes="primary"
+                    Content="Apply"
+                    Command="{Binding ApplyCommand}"
+                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Configuration}" />
+            <Button Classes="primary"
+                    Content="Run Import"
+                    Command="{Binding RunImportCommand}"
+                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=ImportData}" />
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

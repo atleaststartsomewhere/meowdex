@@ -1,0 +1,32 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:Meowdex.Desktop.Views"
+             xmlns:viewModels="clr-namespace:Meowdex.Desktop.ViewModels"
+             x:Class="Meowdex.Desktop.App">
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+    <StyleInclude Source="avares://Meowdex.Desktop/Styles.axaml" />
+  </Application.Styles>
+
+  <Application.DataTemplates>
+    <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
+      <views:DashboardView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:ManageCatsViewModel}">
+      <views:ManageCatsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:AddCatOverlayViewModel}">
+      <views:AddCatOverlayView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:SettingsOverlayViewModel}">
+      <views:SettingsOverlayView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:EditCatOverlayViewModel}">
+      <views:EditCatOverlayView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type viewModels:ConfirmOverlayViewModel}">
+      <views:ConfirmOverlayView />
+    </DataTemplate>
+  </Application.DataTemplates>
+</Application>

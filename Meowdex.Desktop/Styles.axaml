@@ -1,0 +1,180 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:Meowdex.Desktop.Converters">
+  <Styles.Resources>
+    <conv:BoolNotConverter x:Key="BoolNot" />
+    <conv:BoolToOpacityConverter x:Key="BoolToOpacity" />
+    <conv:NullToBoolConverter x:Key="NullToBool" />
+    <conv:MaskConverter x:Key="MaskConverter" />
+    <conv:EqualsConverter x:Key="EqualsConverter" />
+    <conv:EqualityMultiConverter x:Key="EqualityMulti" />
+
+    <SolidColorBrush x:Key="AppBackground" Color="#2B2D31" />
+    <SolidColorBrush x:Key="SurfaceBackground" Color="#313338" />
+    <SolidColorBrush x:Key="SurfaceAltBackground" Color="#383A40" />
+    <SolidColorBrush x:Key="BorderColor" Color="#3F4147" />
+    <SolidColorBrush x:Key="TextPrimary" Color="#E6E8EA" />
+    <SolidColorBrush x:Key="TextMuted" Color="#B5BAC1" />
+    <SolidColorBrush x:Key="Accent" Color="#6EA6FF" />
+    <SolidColorBrush x:Key="AccentStrong" Color="#4C8DFF" />
+  </Styles.Resources>
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{StaticResource AppBackground}" />
+  </Style>
+
+  <Style Selector="UserControl">
+    <Setter Property="Background" Value="{StaticResource AppBackground}" />
+  </Style>
+
+  <Style Selector="TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+  </Style>
+
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+  </Style>
+
+  <Style Selector="NumericUpDown">
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+  </Style>
+
+  <Style Selector="CheckBox">
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+  </Style>
+
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+    <Setter Property="GridLinesVisibility" Value="Horizontal" />
+  </Style>
+
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
+  </Style>
+
+  <Style Selector="Button">
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+  </Style>
+
+  <Style Selector="TextBox, ComboBox, NumericUpDown">
+    <Setter Property="MinHeight" Value="32" />
+  </Style>
+
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{StaticResource AccentStrong}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <Style Selector="Button.ghost">
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+  </Style>
+
+  <Style Selector="Button.icon-btn">
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+    <Setter Property="Width" Value="40" />
+    <Setter Property="Height" Value="40" />
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="Border.badge">
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="CornerRadius" Value="999" />
+  </Style>
+
+  <Style Selector="TextBlock.badge-label">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="Border.badge.gender-male">
+    <Setter Property="Background" Value="#e2f4ff" />
+  </Style>
+
+  <Style Selector="Border.badge.gender-female">
+    <Setter Property="Background" Value="#ffe6ef" />
+  </Style>
+
+  <Style Selector="Border.badge.gender-fluid">
+    <Setter Property="Background" Value="#f5e9ff" />
+  </Style>
+
+  <Style Selector="Border.badge.sexuality-bi">
+    <Setter Property="Background" Value="#efe8ff" />
+  </Style>
+
+  <Style Selector="Border.badge.sexuality-gaylesbian">
+    <Setter Property="Background" Value="#e9f7ef" />
+  </Style>
+
+  <Style Selector="Border.badge.sexuality-straight">
+    <Setter Property="Background" Value="#fff4e0" />
+  </Style>
+
+  <Style Selector="Border.badge.retired">
+    <Setter Property="Background" Value="#2f3136" />
+  </Style>
+
+  <Style Selector="Border.badge.retired TextBlock.badge-label">
+    <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
+  </Style>
+
+  <Style Selector="ToggleButton.settings-tab">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
+    <Setter Property="Padding" Value="6,4" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+  </Style>
+
+  <Style Selector="ToggleButton.settings-tab:checked">
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+  </Style>
+
+  <Style Selector="ToggleButton.settings-tab:checked TextBlock">
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+  <Style Selector="Border.overlay-backdrop">
+    <Setter Property="Background" Value="#AA0E1014" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="Border.overlay-panel">
+    <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="BoxShadow" Value="0 20 40 0 #66000000" />
+  </Style>
+
+  <Style Selector="ContentControl.overlay-content">
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+      </Transitions>
+    </Setter>
+  </Style>
+</Styles>

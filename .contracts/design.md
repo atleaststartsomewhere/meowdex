@@ -8,6 +8,13 @@ Meowdex is a fast decision-support tool for Mewgenics cat management after each 
 1. Entering and maintaining current cat population data.
 2. Producing a recommended breeding pool.
 
+## Design & Interaction Conventions
+- The app behaves like an SPA: navigation happens through in-context controls, not a persistent side nav.
+- The dashboard is organized into screen-like sections, with tab trackers to move between sections and indicate the active view.
+- Global configuration is accessed via a single top-level control and edited in a modal dialog.
+- Manage Cats prioritizes speed and density: full-width roster, inline editing, and modal-driven add flow.
+- Destructive actions require confirmation.
+
 ## Core Cat Data Model
 Each cat has immutable identity + mutable gameplay data.
 
@@ -76,6 +83,18 @@ Intent:
 - Data entry speed is critical.
 - Workflow should support bursts (e.g., ~10 cats in one night).
 - Minimum practical ingress should focus on immutable identity + statline + simple breeding compatibility fields.
+
+## Manage Cats UX Canon
+- Primary roster is a full-width table with sortable columns, including all core stats.
+- Gender and sexuality are rendered as compact icon-like badges.
+- Edit happens inline as an expanded row panel with its own Save/Cancel.
+- Add Cat is a modal dialog that refreshes the roster on save.
+
+## Dashboard UX Canon
+- Sections are treated as canvases with tab trackers for navigation.
+- Snapshot is the first section.
+- Additional sections: Adventuring Team, Breeding Pool Roster, General Population Roster.
+- Config is a global control that opens a modal; closing applies updates and refreshes data.
 
 ## Abilities Tracking Scope
 - Full per-cat ability tracking is considered too costly.
