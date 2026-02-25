@@ -16,5 +16,23 @@
                       Opacity="{Binding OverlayHost.IsOpen, Converter={StaticResource BoolToOpacity}}"
                       Content="{Binding OverlayHost.Current}" />
     </Border>
+
+    <Border x:Name="DebugSelectionHud"
+            IsVisible="False"
+            IsHitTestVisible="False"
+            Background="#CC0B0D10"
+            BorderBrush="#5A5D64"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="8,4"
+            Margin="12"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom">
+      <TextBlock x:Name="DebugSelectionText"
+                 FontSize="11"
+                 FontFamily="Consolas"
+                 Foreground="#E6E8EA"
+                 Text="Selected: (none)" />
+    </Border>
   </Grid>
 </Window>

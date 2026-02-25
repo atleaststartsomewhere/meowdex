@@ -1,10 +1,11 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root"
              x:Class="Meowdex.Desktop.Views.Badges.SexualityBadgeView">
-  <Border x:Name="Badge"
-          Classes="badge"
-          Padding="6,2"
-          CornerRadius="999">
-    <TextBlock x:Name="Label" Classes="badge-label" />
-  </Border>
+  <Image Classes="identity-icon"
+         Width="16"
+         Height="16"
+         HorizontalAlignment="Center"
+         VerticalAlignment="Center"
+         Source="{Binding Sexuality, ElementName=Root, Converter={StaticResource SexualityIconConverter}}" />
 </UserControl>

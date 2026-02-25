@@ -37,17 +37,17 @@
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
-        <DataGridTemplateColumn Header="G" Width="60">
+        <DataGridTemplateColumn Header="G" Width="52">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <badges:GenderBadgeView Gender="{Binding Gender}" />
+              <badges:GenderBadgeView Gender="{Binding Gender}" HorizontalAlignment="Center" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
-        <DataGridTemplateColumn Header="S" Width="70">
+        <DataGridTemplateColumn Header="S" Width="52">
           <DataGridTemplateColumn.CellTemplate>
             <DataTemplate>
-              <badges:SexualityBadgeView Sexuality="{Binding Sexuality}" />
+              <badges:SexualityBadgeView Sexuality="{Binding Sexuality}" HorizontalAlignment="Center" />
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>

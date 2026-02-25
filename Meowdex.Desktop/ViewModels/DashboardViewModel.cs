@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using Meowdex.Core.Models;
 using Meowdex.Core.Services;
 
@@ -37,11 +38,55 @@ public sealed class DashboardViewModel : ViewModelBase
     public int TotalCats => Cats.Count;
     public int RetiredCount => Cats.Count(cat => cat.IsRetired);
     public int NaturalSevenCount => Cats.Count(cat => cat.HasNaturalSeven);
+    public int CoveredSevenCount => CountBits(Plan.CoveredMask);
+    public double CoveragePercent => CoveredSevenCount / 7.0 * 100.0;
+    public string CoverageSummary => $"{CoveredSevenCount}/7 stats covered";
+    public string MissingStatSummary
+    {
+        get
+        {
+            var names = GetMissingStatNames(Plan.CoveredMask);
+            return names.Count == 0 ? "No missing natural-7 stats." : $"Missing: {string.Join(", ", names)}";
+        }
+    }
+    public int LowPartnerRiskCount => Plan.BreedingPool.Count(entry => entry.CompatiblePartners <= 1);
+    public string RiskSummary =>
+        LowPartnerRiskCount == 0 ? "No low-partner breeders in pool." : $"{LowPartnerRiskCount} pool cats have <= 1 compatible partner.";
+    public string NextActionSummary
+    {
+        get
+        {
+            var missing = GetMissingStatNames(Plan.CoveredMask);
+            if (missing.Count > 0)
+            {
+                return $"Find candidates with natural 7 in: {string.Join(", ", missing)}.";
+            }
+
+            if (LowPartnerRiskCount > 0)
+            {
+                return "Review low-partner breeders and consider replacements from Full Roster.";
+            }
+
+            return "Coverage is stable. Validate averages and tune backfill settings if needed.";
+        }
+    }
 
     public BreedingPlanResult Plan
     {
         get => _plan;
-        private set => SetProperty(ref _plan, value);
+        private set
+        {
+            if (SetProperty(ref _plan, value))
+            {
+                RaisePropertyChanged(nameof(CoveredSevenCount));
+                RaisePropertyChanged(nameof(CoveragePercent));
+                RaisePropertyChanged(nameof(CoverageSummary));
+                RaisePropertyChanged(nameof(MissingStatSummary));
+                RaisePropertyChanged(nameof(LowPartnerRiskCount));
+                RaisePropertyChanged(nameof(RiskSummary));
+                RaisePropertyChanged(nameof(NextActionSummary));
+            }
+        }
     }
 
     public int TopCatCount
@@ -136,6 +181,33 @@ public sealed class DashboardViewModel : ViewModelBase
 
         Plan = _advisor.BuildPlan(Cats, new BreedingPlanOptions(TopCatCount, BackfillsPerMask, MinMaskSevenCount));
         RebuildAdventuringTeam();
+    }
+
+    public void SortBreedingPool(string sortPath, ListSortDirection direction)
+    {
+        Func<BreedingPoolEntry, object?> keySelector = sortPath switch
+        {
+            "NameWithId" => entry => entry.Cat.Name,
+            "StrSortKey" => entry => entry.StrSortKey,
+            "DexSortKey" => entry => entry.DexSortKey,
+            "StaSortKey" => entry => entry.StaSortKey,
+            "IntSortKey" => entry => entry.IntSortKey,
+            "SpdSortKey" => entry => entry.SpdSortKey,
+            "ChaSortKey" => entry => entry.ChaSortKey,
+            "LukSortKey" => entry => entry.LukSortKey,
+            "Cat.BaseSevenCount" => entry => entry.Cat.BaseSevenCount,
+            "CompatiblePartners" => entry => entry.CompatiblePartners,
+            "Cat.BaseAverage" => entry => entry.Cat.BaseAverage,
+            "Cat.CurrentAverage" => entry => entry.Cat.CurrentAverage,
+            "Reason" => entry => entry.Reason,
+            _ => entry => entry.Cat.Name
+        };
+
+        var sorted = direction == ListSortDirection.Descending
+            ? Plan.BreedingPool.OrderByDescending(keySelector).ToList()
+            : Plan.BreedingPool.OrderBy(keySelector).ToList();
+
+        Plan = Plan with { BreedingPool = sorted };
     }
 
     private void RebuildAdventuringTeam()
@@ -263,6 +335,39 @@ public sealed class DashboardViewModel : ViewModelBase
         Snapshot,
         Adventuring,
         Breeding,
-        General
+        General,
+        FullRoster
+    }
+
+    private static int CountBits(int mask)
+    {
+        var count = 0;
+        var value = mask;
+        while (value != 0)
+        {
+            count += value & 1;
+            value >>= 1;
+        }
+
+        return count;
+    }
+
+    private static IReadOnlyList<string> GetMissingStatNames(int mask)
+    {
+        var stats = new[]
+        {
+            (Bit: 0, Name: "STR"),
+            (Bit: 1, Name: "DEX"),
+            (Bit: 2, Name: "STA"),
+            (Bit: 3, Name: "INT"),
+            (Bit: 4, Name: "SPD"),
+            (Bit: 5, Name: "CHA"),
+            (Bit: 6, Name: "LCK")
+        };
+
+        return stats
+            .Where(x => (mask & (1 << x.Bit)) == 0)
+            .Select(x => x.Name)
+            .ToList();
     }
 }

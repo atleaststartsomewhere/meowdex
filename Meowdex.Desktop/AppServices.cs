@@ -7,6 +7,8 @@ namespace Meowdex.Desktop;
 
 public static class AppServices
 {
+    private static readonly SemaphoreSlim OverlayGate = new(1, 1);
+
     public static CatRosterService Roster { get; } = new();
     public static BreedingAdvisorService Advisor { get; } = new();
     public static Window? MainWindow { get; set; }
@@ -20,37 +22,39 @@ public static class AppServices
             return false;
         }
 
-        var tcs = new TaskCompletionSource<bool>();
-        var overlay = new ConfirmOverlayViewModel(message, tcs);
-        overlay.RequestClose = () => OverlayHost.Close();
-        OverlayHost.Show(overlay);
-        return await tcs.Task;
+        return await ShowOverlayAsync<bool>(tcs => new ConfirmOverlayViewModel(message, tcs));
     }
 
     public static async Task<CatProfile?> ShowAddCatAsync()
     {
-        var tcs = new TaskCompletionSource<CatProfile?>();
-        var overlay = new AddCatOverlayViewModel(tcs);
-        overlay.RequestClose = () => OverlayHost.Close();
-        OverlayHost.Show(overlay);
-        return await tcs.Task;
+        return await ShowOverlayAsync<CatProfile?>(tcs => new AddCatOverlayViewModel(tcs));
     }
 
     public static async Task<DashboardConfig?> ShowSettingsAsync(DashboardConfig current)
     {
-        var tcs = new TaskCompletionSource<DashboardConfig?>();
-        var overlay = new SettingsOverlayViewModel(current, tcs);
-        overlay.RequestClose = () => OverlayHost.Close();
-        OverlayHost.Show(overlay);
-        return await tcs.Task;
+        return await ShowOverlayAsync<DashboardConfig?>(tcs => new SettingsOverlayViewModel(current, tcs));
     }
 
     public static async Task<EditCatResult?> ShowEditCatAsync(CatProfile cat)
     {
-        var tcs = new TaskCompletionSource<EditCatResult?>();
-        var overlay = new EditCatOverlayViewModel(cat, tcs);
-        overlay.RequestClose = () => OverlayHost.Close();
-        OverlayHost.Show(overlay);
-        return await tcs.Task;
+        return await ShowOverlayAsync<EditCatResult?>(tcs => new EditCatOverlayViewModel(cat, tcs));
+    }
+
+    private static async Task<T> ShowOverlayAsync<T>(Func<TaskCompletionSource<T>, OverlayViewModelBase> createOverlay)
+    {
+        await OverlayGate.WaitAsync();
+
+        try
+        {
+            var tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var overlay = createOverlay(tcs);
+            overlay.RequestClose = () => OverlayHost.Close();
+            OverlayHost.Show(overlay);
+            return await tcs.Task;
+        }
+        finally
+        {
+            OverlayGate.Release();
+        }
     }
 }

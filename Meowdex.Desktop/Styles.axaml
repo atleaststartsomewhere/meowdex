@@ -8,6 +8,10 @@
     <conv:MaskConverter x:Key="MaskConverter" />
     <conv:EqualsConverter x:Key="EqualsConverter" />
     <conv:EqualityMultiConverter x:Key="EqualityMulti" />
+    <conv:GenderIconConverter x:Key="GenderIconConverter" />
+    <conv:SexualityIconConverter x:Key="SexualityIconConverter" />
+    <conv:GenderTextConverter x:Key="GenderTextConverter" />
+    <conv:SexualityTextConverter x:Key="SexualityTextConverter" />
 
     <SolidColorBrush x:Key="AppBackground" Color="#2B2D31" />
     <SolidColorBrush x:Key="SurfaceBackground" Color="#313338" />
@@ -31,6 +35,10 @@
     <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
   </Style>
 
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
+  </Style>
+
   <Style Selector="TextBox">
     <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
     <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
@@ -47,6 +55,30 @@
     <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
     <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
     <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+    <Setter Property="MinWidth" Value="120" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Increment" Value="1" />
+    <Setter Property="ClipValueToMinMax" Value="True" />
+  </Style>
+
+  <Style Selector="NumericUpDown /template/ ButtonSpinner">
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Focusable" Value="False" />
+  </Style>
+
+  <Style Selector="NumericUpDown /template/ Spinner">
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Focusable" Value="False" />
+  </Style>
+
+  <Style Selector="NumericUpDown /template/ RepeatButton">
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Focusable" Value="False" />
+  </Style>
+
+  <Style Selector="NumericUpDown /template/ Button">
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Focusable" Value="False" />
   </Style>
 
   <Style Selector="CheckBox">
@@ -138,6 +170,12 @@
     <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
   </Style>
 
+  <Style Selector="Image.identity-icon">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="Stretch" Value="Uniform" />
+  </Style>
+
   <Style Selector="ToggleButton.settings-tab">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
@@ -168,6 +206,7 @@
     <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
     <Setter Property="CornerRadius" Value="12" />
     <Setter Property="BoxShadow" Value="0 20 40 0 #66000000" />
+    <Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle" />
   </Style>
 
   <Style Selector="ContentControl.overlay-content">

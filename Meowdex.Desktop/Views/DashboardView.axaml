@@ -1,58 +1,83 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:badges="clr-namespace:Meowdex.Desktop.Views.Badges"
              x:Class="Meowdex.Desktop.Views.DashboardView">
   <ScrollViewer>
     <StackPanel Spacing="16" Margin="24">
       <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,8">
-        <TextBlock Text="Mewgenics Dashboard" FontSize="26" FontWeight="Bold" />
+        <TextBlock Text="The Meowdex" FontSize="26" FontWeight="Bold" />
         <Button Grid.Column="1" Classes="icon-btn" Content="⚙" Click="OnSettings" />
         <TextBlock Grid.Row="1" Text="Configure recommendation settings and review the latest breeding plan." />
       </Grid>
 
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <Button Classes="primary" Content="Manage Cats" Click="OnManageCats" />
-      </StackPanel>
-
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <ToggleButton Classes="tab-tracker"
-                      IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot, Mode=OneWay}"
-                      Command="{Binding SetSectionCommand}"
-                      CommandParameter="Snapshot">Snapshot</ToggleButton>
-        <ToggleButton Classes="tab-tracker"
-                      IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring, Mode=OneWay}"
-                      Command="{Binding SetSectionCommand}"
-                      CommandParameter="Adventuring">Adventuring Team</ToggleButton>
-        <ToggleButton Classes="tab-tracker"
-                      IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding, Mode=OneWay}"
-                      Command="{Binding SetSectionCommand}"
-                      CommandParameter="Breeding">Breeding Pool</ToggleButton>
-        <ToggleButton Classes="tab-tracker"
-                      IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=General, Mode=OneWay}"
-                      Command="{Binding SetSectionCommand}"
-                      CommandParameter="General">General Population</ToggleButton>
-      </StackPanel>
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <ToggleButton Classes="tab-tracker"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="Snapshot">Snapshot</ToggleButton>
+          <ToggleButton Classes="tab-tracker"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="Adventuring">Adventuring Team</ToggleButton>
+          <ToggleButton Classes="tab-tracker"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="Breeding">Breeding Pool</ToggleButton>
+          <ToggleButton Classes="tab-tracker"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=General, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="General">General Population</ToggleButton>
+          <ToggleButton Classes="tab-tracker"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=FullRoster, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="FullRoster">Full Roster</ToggleButton>
+        </StackPanel>
+        <Button Grid.Column="1" Classes="primary" Content="Add Cat" Click="OnAddCat" />
+      </Grid>
 
       <StackPanel Spacing="16">
         <StackPanel Spacing="8"
                     IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot}">
           <TextBlock Text="Snapshot" FontSize="18" FontWeight="SemiBold" />
-          <StackPanel>
-            <TextBlock Text="{Binding TotalCats, StringFormat=Total cats: {0}}" />
-            <TextBlock Text="{Binding RetiredCount, StringFormat=Retired cats: {0}}" />
-            <TextBlock Text="{Binding NaturalSevenCount, StringFormat=Cats with natural base 7: {0}}" />
-            <TextBlock Text="{Binding Plan.BreedingPool.Count, StringFormat=Breeding pool size: {0}}" />
-            <TextBlock Text="{Binding Plan.GeneralPopulation.Count, StringFormat=General population size: {0}}" />
-          </StackPanel>
+          <Grid ColumnDefinitions="*,*,*">
+            <Border Grid.Column="0" Classes="overlay-panel" Padding="12" Margin="0,0,8,0">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Coverage" FontWeight="SemiBold" />
+                <TextBlock FontSize="20" FontWeight="Bold"
+                           Text="{Binding CoverageSummary}" />
+                <TextBlock Text="{Binding CoveragePercent, StringFormat={}{0:F0}% total mask coverage}" />
+                <TextBlock Text="{Binding MissingStatSummary}" TextWrapping="Wrap" />
+                <TextBlock Classes="muted"
+                           Text="{Binding Plan.CoveredMask, Converter={StaticResource MaskConverter}, StringFormat=Mask: {0}}" />
+              </StackPanel>
+            </Border>
 
-          <StackPanel>
-            <TextBlock Text="{Binding Plan.TopCats.Count, StringFormat=Selected top cats: {0}}"/>
-            <TextBlock Text="{Binding Plan.BackfillsPerMask, StringFormat=Backfills per mask: {0}}" />
-            <TextBlock Text="{Binding MinMaskSevenCount, StringFormat=Minimum 7s per mask: {0}}" />
-            <TextBlock>
-              <Run Text="Covered 7-mask: " />
-              <Run Text="{Binding Plan.CoveredMask, Converter={StaticResource MaskConverter}}" />
-            </TextBlock>
-          </StackPanel>
+            <Border Grid.Column="1" Classes="overlay-panel" Padding="12" Margin="4,0">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Risks" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding RiskSummary}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding RetiredCount, StringFormat=Retired cats: {0}}" />
+                <TextBlock Text="{Binding Plan.BreedingPool.Count, StringFormat=Breeding pool size: {0}}" />
+                <TextBlock Text="{Binding NaturalSevenCount, StringFormat=Natural 7 cats: {0}}" />
+              </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Classes="overlay-panel" Padding="12" Margin="8,0,0,0">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Next Actions" FontWeight="SemiBold" />
+                <TextBlock TextWrapping="Wrap" Text="{Binding NextActionSummary}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button Content="Open Breeding"
+                          Command="{Binding SetSectionCommand}"
+                          CommandParameter="Breeding" />
+                  <Button Content="Open Full Roster"
+                          Command="{Binding SetSectionCommand}"
+                          CommandParameter="FullRoster" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </Grid>
         </StackPanel>
 
         <StackPanel Spacing="10"
@@ -74,7 +99,11 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
 
-          <DataGrid ItemsSource="{Binding AdventuringTeam}" AutoGenerateColumns="False" IsReadOnly="True" Height="240">
+          <DataGrid x:Name="AdventuringGrid"
+                    ItemsSource="{Binding AdventuringTeam}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    Height="240">
             <DataGrid.Columns>
               <DataGridTextColumn Header="Row" Binding="{Binding Row}" Width="60" />
               <DataGridTextColumn Header="Stat Priority" Binding="{Binding Choice}" Width="120" />
@@ -89,32 +118,47 @@
         <StackPanel Spacing="10"
                     IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}">
           <TextBlock Text="Breeding Pool Roster" FontSize="18" FontWeight="SemiBold" />
-          <DataGrid ItemsSource="{Binding Plan.BreedingPool}" AutoGenerateColumns="False" IsReadOnly="True">
+          <DataGrid x:Name="BreedingPoolGrid"
+                    ItemsSource="{Binding Plan.BreedingPool}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    Sorting="OnBreedingPoolSorting">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="60" />
-              <DataGridTextColumn Header="Name" Binding="{Binding Cat.Name}" Width="160" />
-              <DataGridTextColumn Header="Mask" Binding="{Binding SevenMask}" Width="80" />
-              <DataGridTextColumn Header="#7s" Binding="{Binding Cat.BaseSevenCount}" Width="70" />
-              <DataGridTextColumn Header="Partners" Binding="{Binding CompatiblePartners}" Width="90" />
-              <DataGridTextColumn Header="B Avg" Binding="{Binding Cat.BaseAverage}" Width="90" />
-              <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" />
+              <DataGridTemplateColumn Header="Name (#{ID})" Width="230" SortMemberPath="NameWithId">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <TextBlock Text="{Binding Cat.Name}" />
+                      <TextBlock Classes="muted"
+                                 FontSize="11"
+                                 Text="{Binding Id, StringFormat=(#{0})}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="STR" Binding="{Binding StrMark}" Width="58" SortMemberPath="StrSortKey" />
+              <DataGridTextColumn Header="DEX" Binding="{Binding DexMark}" Width="58" SortMemberPath="DexSortKey" />
+              <DataGridTextColumn Header="STA" Binding="{Binding StaMark}" Width="58" SortMemberPath="StaSortKey" />
+              <DataGridTextColumn Header="INT" Binding="{Binding IntMark}" Width="58" SortMemberPath="IntSortKey" />
+              <DataGridTextColumn Header="SPD" Binding="{Binding SpdMark}" Width="58" SortMemberPath="SpdSortKey" />
+              <DataGridTextColumn Header="CHA" Binding="{Binding ChaMark}" Width="58" SortMemberPath="ChaSortKey" />
+              <DataGridTextColumn Header="LUK" Binding="{Binding LukMark}" Width="58" SortMemberPath="LukSortKey" />
+              <DataGridTextColumn Header="#7s" Binding="{Binding Cat.BaseSevenCount}" Width="70" SortMemberPath="Cat.BaseSevenCount" />
+              <DataGridTextColumn Header="#Partners" Binding="{Binding CompatiblePartners}" Width="98" SortMemberPath="CompatiblePartners" />
+              <DataGridTextColumn Header="Base &#x03BC;" Binding="{Binding Cat.BaseAverage}" Width="88" SortMemberPath="Cat.BaseAverage" />
+              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding Cat.CurrentAverage}" Width="108" SortMemberPath="Cat.CurrentAverage" />
+              <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" SortMemberPath="Reason" />
             </DataGrid.Columns>
           </DataGrid>
-
-          <TextBlock Text="Diversity Backfill" FontWeight="SemiBold" />
-          <ItemsControl ItemsSource="{Binding Plan.AdditionalDiversityCats}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <TextBlock Text="{Binding Name}" />
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
         </StackPanel>
 
         <StackPanel Spacing="10"
                     IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=General}">
           <TextBlock Text="General Population Roster" FontSize="18" FontWeight="SemiBold" />
-          <DataGrid ItemsSource="{Binding Plan.GeneralPopulation}" AutoGenerateColumns="False" IsReadOnly="True">
+          <DataGrid x:Name="GeneralPopulationGrid"
+                    ItemsSource="{Binding Plan.GeneralPopulation}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True">
             <DataGrid.Columns>
               <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="60" />
               <DataGridTextColumn Header="Name" Binding="{Binding Cat.Name}" Width="180" />
@@ -123,7 +167,66 @@
             </DataGrid.Columns>
           </DataGrid>
         </StackPanel>
+
+        <StackPanel Spacing="10"
+                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=FullRoster}">
+          <TextBlock Text="Full Roster" FontSize="18" FontWeight="SemiBold" />
+          <DataGrid x:Name="FullRosterGrid"
+                    ItemsSource="{Binding Cats}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    Height="520"
+                    CanUserSortColumns="True"
+                    SelectionMode="Single"
+                    HeadersVisibility="Column"
+                    HorizontalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="140" SortMemberPath="Name" />
+              <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" SortMemberPath="Id" />
+              <DataGridTemplateColumn Header="R" Width="60" SortMemberPath="IsRetired">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Border Classes="badge retired" IsVisible="{Binding IsRetired}">
+                      <TextBlock Classes="badge-label" Text="R" />
+                    </Border>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="G" Width="52">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <badges:GenderBadgeView Gender="{Binding Gender}" HorizontalAlignment="Center" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="S" Width="52">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <badges:SexualityBadgeView Sexuality="{Binding Sexuality}" HorizontalAlignment="Center" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="Str B" Binding="{Binding StrengthBase}" Width="70" />
+              <DataGridTextColumn Header="Str C" Binding="{Binding StrengthCurrent}" Width="70" />
+              <DataGridTextColumn Header="Dex B" Binding="{Binding DexterityBase}" Width="70" />
+              <DataGridTextColumn Header="Dex C" Binding="{Binding DexterityCurrent}" Width="70" />
+              <DataGridTextColumn Header="Sta B" Binding="{Binding StaminaBase}" Width="70" />
+              <DataGridTextColumn Header="Sta C" Binding="{Binding StaminaCurrent}" Width="70" />
+              <DataGridTextColumn Header="Int B" Binding="{Binding IntellectBase}" Width="70" />
+              <DataGridTextColumn Header="Int C" Binding="{Binding IntellectCurrent}" Width="70" />
+              <DataGridTextColumn Header="Spd B" Binding="{Binding SpeedBase}" Width="70" />
+              <DataGridTextColumn Header="Spd C" Binding="{Binding SpeedCurrent}" Width="70" />
+              <DataGridTextColumn Header="Cha B" Binding="{Binding CharismaBase}" Width="70" />
+              <DataGridTextColumn Header="Cha C" Binding="{Binding CharismaCurrent}" Width="70" />
+              <DataGridTextColumn Header="Lck B" Binding="{Binding LuckBase}" Width="70" />
+              <DataGridTextColumn Header="Lck C" Binding="{Binding LuckCurrent}" Width="70" />
+              <DataGridTextColumn Header="B Avg" Binding="{Binding BaseAverage}" Width="70" />
+              <DataGridTextColumn Header="C Avg" Binding="{Binding CurrentAverage}" Width="70" />
+            </DataGrid.Columns>
+          </DataGrid>
+        </StackPanel>
       </StackPanel>
     </StackPanel>
   </ScrollViewer>
 </UserControl>
+

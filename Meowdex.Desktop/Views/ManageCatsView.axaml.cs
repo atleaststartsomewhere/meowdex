@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Meowdex.Core.Models;
 using Meowdex.Desktop.ViewModels;
+using System.Diagnostics;
 
 namespace Meowdex.Desktop.Views;
 
@@ -18,9 +19,16 @@ public sealed partial class ManageCatsView : UserControl
 
     private async void OnAttachedToVisualTree(object? sender, Avalonia.VisualTreeAttachmentEventArgs e)
     {
-        if (DataContext is ManageCatsViewModel vm)
+        try
         {
-            await vm.RefreshAsync();
+            if (DataContext is ManageCatsViewModel vm)
+            {
+                await vm.RefreshAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"ManageCatsView attach refresh failed: {ex}");
         }
     }
 
@@ -34,32 +42,53 @@ public sealed partial class ManageCatsView : UserControl
 
     private async void OnAdd(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not ManageCatsViewModel vm)
+        try
         {
-            return;
-        }
+            if (DataContext is not ManageCatsViewModel vm)
+            {
+                return;
+            }
 
-        var result = await AppServices.ShowAddCatAsync();
-        if (result is not null)
+            var result = await AppServices.ShowAddCatAsync();
+            if (result is not null)
+            {
+                await vm.AddCatAsync(result);
+            }
+        }
+        catch (Exception ex)
         {
-            await vm.AddCatAsync(result);
+            Trace.WriteLine($"ManageCatsView add workflow failed: {ex}");
         }
     }
 
     private async void OnSettings(object? sender, RoutedEventArgs e)
     {
-        var result = await AppServices.ShowSettingsAsync(AppServices.SettingsConfig);
-        if (result is not null)
+        try
         {
-            AppServices.SettingsConfig = result;
+            var result = await AppServices.ShowSettingsAsync(AppServices.SettingsConfig);
+            if (result is not null)
+            {
+                AppServices.SettingsConfig = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"ManageCatsView settings workflow failed: {ex}");
         }
     }
 
     private async void OnLookup(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is ManageCatsViewModel vm)
+        try
         {
-            await vm.LookupAsync();
+            if (DataContext is ManageCatsViewModel vm)
+            {
+                await vm.LookupAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"ManageCatsView lookup failed: {ex}");
         }
     }
 
@@ -86,27 +115,36 @@ public sealed partial class ManageCatsView : UserControl
         _openingEdit = true;
         grid.SelectedItem = null;
 
-        var result = await AppServices.ShowEditCatAsync(cat);
-        if (result is not null)
+        try
         {
-            switch (result.Action)
+            var result = await AppServices.ShowEditCatAsync(cat);
+            if (result is not null)
             {
-                case EditCatAction.Save when result.Cat is not null:
-                    await vm.UpdateCatAsync(result.Cat);
-                    break;
-                case EditCatAction.Delete:
-                    if (result.Cat is not null)
-                    {
-                        var ok = await AppServices.ConfirmAsync($"Remove cat #{result.Cat.Id}?");
-                        if (ok)
+                switch (result.Action)
+                {
+                    case EditCatAction.Save when result.Cat is not null:
+                        await vm.UpdateCatAsync(result.Cat);
+                        break;
+                    case EditCatAction.Delete:
+                        if (result.Cat is not null)
                         {
-                            await vm.DeleteCatAsync(result.Cat.Id);
+                            var ok = await AppServices.ConfirmAsync($"Remove cat #{result.Cat.Id}?");
+                            if (ok)
+                            {
+                                await vm.DeleteCatAsync(result.Cat.Id);
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
         }
-
-        _openingEdit = false;
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"ManageCatsView row edit workflow failed: {ex}");
+        }
+        finally
+        {
+            _openingEdit = false;
+        }
     }
 }

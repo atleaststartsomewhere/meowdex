@@ -9,7 +9,7 @@
       <Grid RowDefinitions="Auto,* ,Auto">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
           <TextBlock Text="Add Cat" FontSize="20" FontWeight="Bold" />
-          <Button Grid.Column="1" Content="✕" Command="{Binding CancelCommand}" />
+          <Button x:Name="CloseButton" Grid.Column="1" Classes="icon-btn" Content="X" Command="{Binding CancelCommand}" TabIndex="17" />
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -17,77 +17,128 @@
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto">
               <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
                 <TextBlock Text="Name" />
-                <TextBox Text="{Binding Editor.Cat.Name}" />
+                <TextBox x:Name="NameInput" Text="{Binding Editor.Cat.Name}" TabIndex="18" />
               </StackPanel>
 
               <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
                 <TextBlock Text="Gender" />
-                <ComboBox ItemsSource="{Binding Editor.GenderOptions}" SelectedItem="{Binding Editor.Cat.Gender}" />
+                <ComboBox x:Name="GenderInput" ItemsSource="{Binding Editor.GenderOptions}" SelectedItem="{Binding Editor.Cat.Gender}" TabIndex="19">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <Grid ColumnDefinitions="*,Auto" Margin="0,0,2,0">
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="{Binding ., Converter={StaticResource GenderTextConverter}}" />
+                        <Image Grid.Column="1"
+                               Margin="8,0,0,0"
+                               Classes="identity-icon"
+                               Source="{Binding ., Converter={StaticResource GenderIconConverter}}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
               </StackPanel>
 
               <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
                 <TextBlock Text="Sexuality" />
-                <ComboBox ItemsSource="{Binding Editor.SexualityOptions}" SelectedItem="{Binding Editor.Cat.Sexuality}" />
+                <ComboBox x:Name="SexualityInput" ItemsSource="{Binding Editor.SexualityOptions}" SelectedItem="{Binding Editor.Cat.Sexuality}" TabIndex="20">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <Grid ColumnDefinitions="*,Auto" Margin="0,0,2,0">
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="{Binding ., Converter={StaticResource SexualityTextConverter}}" />
+                        <Image Grid.Column="1"
+                               Margin="8,0,0,0"
+                               Classes="identity-icon"
+                               Source="{Binding ., Converter={StaticResource SexualityIconConverter}}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
               </StackPanel>
 
               <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
                 <TextBlock Text="Retired" />
-                <CheckBox IsChecked="{Binding Editor.Cat.IsRetired}" Content="Retired" />
+                <CheckBox x:Name="RetiredInput" IsChecked="{Binding Editor.Cat.IsRetired}" Content="Retired" TabIndex="21" />
               </StackPanel>
 
               <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="6">
                 <TextBlock Text="Notes" />
-                <TextBox Text="{Binding Editor.Cat.Notes}" AcceptsReturn="True" Height="80" />
+                <TextBox x:Name="NotesInput" Text="{Binding Editor.Cat.Notes}" AcceptsReturn="True" Height="80" TabIndex="22" />
               </StackPanel>
             </Grid>
 
             <TextBlock Text="Stats" FontWeight="SemiBold" />
-            <Grid ColumnDefinitions="2*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-              <TextBlock Grid.Row="0" Grid.Column="0" Text="Stat" FontWeight="SemiBold" />
-              <TextBlock Grid.Row="0" Grid.Column="1" Text="Current" FontWeight="SemiBold" />
-              <TextBlock Grid.Row="0" Grid.Column="2" Text="Base (0-7)" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Spacing="8">
+                <Grid ColumnDefinitions="Auto,Auto,Auto">
+                  <TextBlock Grid.Column="1" Text="Current" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="Base" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                </Grid>
 
-              <TextBlock Grid.Row="1" Grid.Column="0" Text="Strength" />
-              <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding Editor.Cat.StrengthCurrent}" Minimum="0" Maximum="99" />
-              <NumericUpDown Grid.Row="1" Grid.Column="2" Value="{Binding Editor.Cat.StrengthBase}" Minimum="0" Maximum="7" />
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Strength" />
+                  <NumericUpDown x:Name="StrCurrentInput" Grid.Column="1" Width="132" Value="{Binding Editor.Cat.StrengthCurrent}" Minimum="0" Maximum="999" TabIndex="1" />
+                  <NumericUpDown x:Name="StrBaseInput" Grid.Column="2" Width="132" Value="{Binding Editor.Cat.StrengthBase}" Minimum="0" Maximum="7" TabIndex="2" />
+                </Grid>
 
-              <TextBlock Grid.Row="2" Grid.Column="0" Text="Dexterity" />
-              <NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding Editor.Cat.DexterityCurrent}" Minimum="0" Maximum="99" />
-              <NumericUpDown Grid.Row="2" Grid.Column="2" Value="{Binding Editor.Cat.DexterityBase}" Minimum="0" Maximum="7" />
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Dexterity" />
+                  <NumericUpDown x:Name="DexCurrentInput" Grid.Column="1" Width="132" Value="{Binding Editor.Cat.DexterityCurrent}" Minimum="0" Maximum="999" TabIndex="3" />
+                  <NumericUpDown x:Name="DexBaseInput" Grid.Column="2" Width="132" Value="{Binding Editor.Cat.DexterityBase}" Minimum="0" Maximum="7" TabIndex="4" />
+                </Grid>
 
-              <TextBlock Grid.Row="3" Grid.Column="0" Text="Stamina" />
-              <NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding Editor.Cat.StaminaCurrent}" Minimum="0" Maximum="99" />
-              <NumericUpDown Grid.Row="3" Grid.Column="2" Value="{Binding Editor.Cat.StaminaBase}" Minimum="0" Maximum="7" />
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Stamina" />
+                  <NumericUpDown x:Name="StamCurrentInput" Grid.Column="1" Width="132" Value="{Binding Editor.Cat.StaminaCurrent}" Minimum="0" Maximum="999" TabIndex="5" />
+                  <NumericUpDown x:Name="StamBaseInput" Grid.Column="2" Width="132" Value="{Binding Editor.Cat.StaminaBase}" Minimum="0" Maximum="7" TabIndex="6" />
+                </Grid>
+              </StackPanel>
 
-              <TextBlock Grid.Row="4" Grid.Column="0" Text="Intellect" />
-              <NumericUpDown Grid.Row="4" Grid.Column="1" Value="{Binding Editor.Cat.IntellectCurrent}" Minimum="0" Maximum="99" />
-              <NumericUpDown Grid.Row="4" Grid.Column="2" Value="{Binding Editor.Cat.IntellectBase}" Minimum="0" Maximum="7" />
+              <StackPanel Grid.Column="1" Spacing="8">
+                <Grid ColumnDefinitions="Auto,Auto,Auto">
+                  <TextBlock Grid.Column="1" Text="Current" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                  <TextBlock Grid.Column="2" Text="Base" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                </Grid>
 
-              <TextBlock Grid.Row="5" Grid.Column="0" Text="Speed" />
-              <NumericUpDown Grid.Row="5" Grid.Column="1" Value="{Binding Editor.Cat.SpeedCurrent}" Minimum="0" Maximum="99" />
-              <NumericUpDown Grid.Row="5" Grid.Column="2" Value="{Binding Editor.Cat.SpeedBase}" Minimum="0" Maximum="7" />
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Intellect" />
+                  <NumericUpDown x:Name="IntCurrentInput" Grid.Column="1" Width="132" Value="{Binding Editor.Cat.IntellectCurrent}" Minimum="0" Maximum="999" TabIndex="7" />
+                  <NumericUpDown x:Name="IntBaseInput" Grid.Column="2" Width="132" Value="{Binding Editor.Cat.IntellectBase}" Minimum="0" Maximum="7" TabIndex="8" />
+                </Grid>
 
-              <TextBlock Grid.Row="6" Grid.Column="0" Text="Charisma" />
-              <NumericUpDown Grid.Row="6" Grid.Column="1" Value="{Binding Editor.Cat.CharismaCurrent}" Minimum="0" Maximum="99" />
-              <NumericUpDown Grid.Row="6" Grid.Column="2" Value="{Binding Editor.Cat.CharismaBase}" Minimum="0" Maximum="7" />
-            </Grid>
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Speed" />
+                  <NumericUpDown x:Name="SpeedCurrentInput" Grid.Column="1" Width="132" Value="{Binding Editor.Cat.SpeedCurrent}" Minimum="0" Maximum="999" TabIndex="9" />
+                  <NumericUpDown x:Name="SpeedBaseInput" Grid.Column="2" Width="132" Value="{Binding Editor.Cat.SpeedBase}" Minimum="0" Maximum="7" TabIndex="10" />
+                </Grid>
 
-            <Grid ColumnDefinitions="2*,*,*" RowDefinitions="Auto">
-              <TextBlock Grid.Row="0" Grid.Column="0" Text="Luck" />
-              <NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding Editor.Cat.LuckCurrent}" Minimum="0" Maximum="99" />
-              <NumericUpDown Grid.Row="0" Grid.Column="2" Value="{Binding Editor.Cat.LuckBase}" Minimum="0" Maximum="7" />
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Charisma" />
+                  <NumericUpDown x:Name="CharCurrentInput" Grid.Column="1" Width="132" Value="{Binding Editor.Cat.CharismaCurrent}" Minimum="0" Maximum="999" TabIndex="11" />
+                  <NumericUpDown x:Name="CharBaseInput" Grid.Column="2" Width="132" Value="{Binding Editor.Cat.CharismaBase}" Minimum="0" Maximum="7" TabIndex="12" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="Luck" />
+                  <NumericUpDown x:Name="LuckCurrentInput" Grid.Column="1" Width="132" Value="{Binding Editor.Cat.LuckCurrent}" Minimum="0" Maximum="999" TabIndex="13" />
+                  <NumericUpDown x:Name="LuckBaseInput" Grid.Column="2" Width="132" Value="{Binding Editor.Cat.LuckBase}" Minimum="0" Maximum="7" TabIndex="14" />
+                </Grid>
+              </StackPanel>
             </Grid>
           </StackPanel>
         </ScrollViewer>
 
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
-          <Button Content="Current = Base" Command="{Binding SyncCommand}" />
+          <Button Content="Current = Base" Command="{Binding SyncCommand}" IsTabStop="False" />
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-            <Button Content="Cancel" Command="{Binding CancelCommand}" />
-            <Button Classes="primary" Content="Add Cat" Command="{Binding SaveCommand}" />
+            <Button x:Name="SaveButton" Classes="primary" Content="Add Cat" Command="{Binding SaveCommand}" TabIndex="15" />
+            <Button x:Name="CancelButton" Content="Cancel" Command="{Binding CancelCommand}" TabIndex="16" />
           </StackPanel>
         </Grid>
       </Grid>
     </Border>
   </Grid>
 </UserControl>
+
+
+
