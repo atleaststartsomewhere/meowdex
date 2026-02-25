@@ -1,7 +1,7 @@
 # Publish Instructions
 
 ## Packaged Zip (Friend-Friendly Handoff)
-Use the Windows script to build and zip both Windows and Linux outputs in one go.
+Use the Windows script to build and zip Windows, Linux, and macOS outputs in one go.
 
 ```
 ./.scripts/publish.ps1
@@ -10,6 +10,8 @@ Use the Windows script to build and zip both Windows and Linux outputs in one go
 The zips are created in the repo root, e.g.:
 `Meowdex.Desktop-win-x64-Release.zip`
 `Meowdex.Desktop-linux-x64-Release.zip`
+`Meowdex.Desktop-osx-x64-Release.zip`
+`Meowdex.Desktop-osx-arm64-Release.zip`
 
 Each zip is a **self‑contained single‑file** build inside the publish folder.
 
@@ -26,6 +28,16 @@ dotnet publish Meowdex.Desktop/Meowdex.Desktop.csproj -c Release -r win-x64 --se
 dotnet publish Meowdex.Desktop/Meowdex.Desktop.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true
 ```
 
+### macOS (Intel x64)
+```
+dotnet publish Meowdex.Desktop/Meowdex.Desktop.csproj -c Release -r osx-x64 --self-contained true -p:PublishSingleFile=true
+```
+
+### macOS (Apple Silicon)
+```
+dotnet publish Meowdex.Desktop/Meowdex.Desktop.csproj -c Release -r osx-arm64 --self-contained true -p:PublishSingleFile=true
+```
+
 ## Install/Run (Linux)
 1. Unzip the publish folder or the zip file.
 2. Make the binary executable:
@@ -40,4 +52,9 @@ chmod +x Meowdex.Desktop
 ## cats.json location (Linux)
 ```
 ~/.config/Meowdex/cats.json
+```
+
+## cats.json location (macOS)
+```
+~/Library/Application Support/Meowdex/cats.json
 ```

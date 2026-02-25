@@ -4,6 +4,8 @@
     <OutputType Condition="$([MSBuild]::IsOSPlatform('windows'))">WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <ApplicationTitle>Meowdex</ApplicationTitle>
+    <Product>Meowdex</Product>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

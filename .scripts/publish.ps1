@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 
 $project = "Meowdex.Desktop/Meowdex.Desktop.csproj"
 $config = "Release"
-$runtimes = @("win-x64", "linux-x64")
+$runtimes = @("win-x64", "linux-x64", "osx-x64", "osx-arm64")
 
 foreach ($runtime in $runtimes) {
     $publishDir = "Meowdex.Desktop/bin/$config/net8.0/$runtime/publish"
