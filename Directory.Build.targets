@@ -1,0 +1,40 @@
+<Project>
+  <Target Name="SetDesktopBuildIdentity"
+          BeforeTargets="GenerateAssemblyInfo"
+          Condition="'$(MSBuildProjectName)' == 'Meowdex.Desktop'">
+    <PropertyGroup>
+      <VersionPrefix Condition="'$(VersionPrefix)' == ''">1.0.0</VersionPrefix>
+      <_BuildStamp>$([System.DateTime]::UtcNow.ToString('yyyyMMddHHmmss'))</_BuildStamp>
+      <_GitCommitCount>0</_GitCommitCount>
+      <_GitShortSha>nogit</_GitShortSha>
+    </PropertyGroup>
+
+    <Exec Command="git rev-list --count HEAD"
+          ConsoleToMSBuild="true"
+          StandardOutputImportance="Low"
+          StandardErrorImportance="Low"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" ItemName="_GitCommitCountOutput" />
+    </Exec>
+
+    <Exec Command="git rev-parse --short HEAD"
+          ConsoleToMSBuild="true"
+          StandardOutputImportance="Low"
+          StandardErrorImportance="Low"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" ItemName="_GitShortShaOutput" />
+    </Exec>
+
+    <PropertyGroup>
+      <_GitCommitCountRaw>@(_GitCommitCountOutput, '')</_GitCommitCountRaw>
+      <_GitShortShaRaw>@(_GitShortShaOutput, '')</_GitShortShaRaw>
+      <_GitCommitCount Condition="'$(_GitCommitCountRaw)' != ''">$([System.String]::Copy('$(_GitCommitCountRaw)').Trim())</_GitCommitCount>
+      <_GitShortSha Condition="'$(_GitShortShaRaw)' != ''">$([System.String]::Copy('$(_GitShortShaRaw)').Trim())</_GitShortSha>
+
+      <AssemblyVersion>1.0.0.0</AssemblyVersion>
+      <FileVersion>1.0.$(_GitCommitCount).0</FileVersion>
+      <Version>$(VersionPrefix)</Version>
+      <InformationalVersion>$(VersionPrefix)+build.$(_BuildStamp).git.$(_GitShortSha)</InformationalVersion>
+    </PropertyGroup>
+  </Target>
+</Project>

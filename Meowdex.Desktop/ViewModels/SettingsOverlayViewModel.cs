@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Meowdex.Desktop.ViewModels;
 
 public sealed class SettingsOverlayViewModel : OverlayViewModelBase
@@ -51,6 +53,22 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
     {
         get => _importSummary;
         private set => SetProperty(ref _importSummary, value);
+    }
+
+    public string BuildIdentity
+    {
+        get
+        {
+            var assembly = typeof(App).Assembly;
+            var info = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            if (!string.IsNullOrWhiteSpace(info))
+            {
+                return $"Build: {info}";
+            }
+
+            var version = assembly.GetName().Version?.ToString() ?? "unknown";
+            return $"Build: {version}";
+        }
     }
 
     private void Apply()
