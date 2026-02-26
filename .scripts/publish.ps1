@@ -4,13 +4,17 @@ $project = "Meowdex.Desktop/Meowdex.Desktop.csproj"
 $config = "Release"
 $runtimes = @("win-x64", "linux-x64", "osx-x64", "osx-arm64")
 
-foreach ($runtime in $runtimes) {
-    $publishDir = "Meowdex.Desktop/bin/$config/net8.0/$runtime/publish"
-    $zipName = "Meowdex.Desktop-$runtime-$config.zip"
+function Publish-ZipRuntime {
+    param(
+        [string]$Runtime
+    )
+
+    $publishDir = "Meowdex.Desktop/bin/$config/net8.0/$Runtime/publish"
+    $zipName = "Meowdex.Desktop-$Runtime-$config.zip"
     $zipPath = Join-Path (Get-Location) $zipName
 
-    Write-Host "Publishing $project ($config, $runtime, single-file)..."
-    dotnet publish $project -c $config -r $runtime --self-contained true -p:PublishSingleFile=true
+    Write-Host "Publishing $project ($config, $Runtime, single-file)..."
+    dotnet publish $project -c $config -r $Runtime --self-contained true -p:PublishSingleFile=true
 
     if (Test-Path $zipPath) {
         Remove-Item $zipPath -Force
@@ -18,6 +22,10 @@ foreach ($runtime in $runtimes) {
 
     Write-Host "Zipping publish output to $zipName..."
     Compress-Archive -Path (Join-Path $publishDir "*") -DestinationPath $zipPath
+}
+
+foreach ($runtime in $runtimes) {
+    Publish-ZipRuntime -Runtime $runtime
 }
 
 Write-Host "Done."

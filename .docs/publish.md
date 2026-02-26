@@ -1,22 +1,23 @@
 # Publish Instructions
 
-## Packaged Zip (Friend-Friendly Handoff)
-Use the Windows script to build and zip Windows, Linux, and macOS outputs in one go.
+## Packaged Artifacts
+Use the publish script to build packaged outputs in one run:
 
 ```
 ./.scripts/publish.ps1
 ```
 
-The zips are created in the repo root, e.g.:
-`Meowdex.Desktop-win-x64-Release.zip`
-`Meowdex.Desktop-linux-x64-Release.zip`
-`Meowdex.Desktop-osx-x64-Release.zip`
-`Meowdex.Desktop-osx-arm64-Release.zip`
+Artifacts are created in the repo root:
+- `Meowdex.Desktop-win-x64-Release.zip`
+- `Meowdex.Desktop-linux-x64-Release.zip`
+- `Meowdex.Desktop-osx-x64-Release.zip`
+- `Meowdex.Desktop-osx-arm64-Release.zip`
 
-Each zip is a **self‑contained single‑file** build inside the publish folder.
+Notes:
+- All outputs are zipped publish folders.
 
 ## Single-File Build (Manual)
-These commands produce a single-file executable (self-contained) if you need to run them directly.
+These commands produce self-contained single-file builds.
 
 ### Windows (x64)
 ```
@@ -39,7 +40,7 @@ dotnet publish Meowdex.Desktop/Meowdex.Desktop.csproj -c Release -r osx-arm64 --
 ```
 
 ## Install/Run (Linux)
-1. Unzip the publish folder or the zip file.
+1. Unzip the Linux publish archive.
 2. Make the binary executable:
 ```
 chmod +x Meowdex.Desktop

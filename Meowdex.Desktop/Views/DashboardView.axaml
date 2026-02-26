@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:badges="clr-namespace:Meowdex.Desktop.Views.Badges"
              x:Class="Meowdex.Desktop.Views.DashboardView">
   <ScrollViewer>
     <StackPanel Spacing="16" Margin="24">
@@ -59,7 +58,7 @@
                 <TextBlock Text="{Binding RiskSummary}" TextWrapping="Wrap" />
                 <TextBlock Text="{Binding RetiredCount, StringFormat=Retired cats: {0}}" />
                 <TextBlock Text="{Binding Plan.BreedingPool.Count, StringFormat=Breeding pool size: {0}}" />
-                <TextBlock Text="{Binding NaturalSevenCount, StringFormat=Natural 7 cats: {0}}" />
+                <TextBlock Text="{Binding NaturalSevenSummary}" />
               </StackPanel>
             </Border>
 
@@ -105,11 +104,27 @@
                     IsReadOnly="True"
                     Height="240">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Row" Binding="{Binding Row}" Width="60" />
-              <DataGridTextColumn Header="Stat Priority" Binding="{Binding Choice}" Width="120" />
-              <DataGridTextColumn Header="Cat" Binding="{Binding Cat.Name}" Width="*" />
-              <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="100" />
-              <DataGridTextColumn Header="C Avg" Binding="{Binding Cat.CurrentAverage}" Width="100" />
+              <DataGridTextColumn Header="Stat Priority" Binding="{Binding Choice}" Width="140" />
+              <DataGridTemplateColumn Header="Name" Width="*">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <TextBlock Text="{Binding Cat.Name}" />
+                      <TextBlock Classes="muted"
+                                 FontSize="11"
+                                 Text="{Binding Cat.Id, StringFormat=(#{0})}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding Cat.CurrentAverage, StringFormat={}{0:F2}}" Width="100" />
+              <DataGridTextColumn Header="STR C" Binding="{Binding Cat.StrengthCurrent}" Width="62" />
+              <DataGridTextColumn Header="DEX C" Binding="{Binding Cat.DexterityCurrent}" Width="62" />
+              <DataGridTextColumn Header="STA C" Binding="{Binding Cat.StaminaCurrent}" Width="62" />
+              <DataGridTextColumn Header="INT C" Binding="{Binding Cat.IntellectCurrent}" Width="62" />
+              <DataGridTextColumn Header="SPD C" Binding="{Binding Cat.SpeedCurrent}" Width="62" />
+              <DataGridTextColumn Header="CHA C" Binding="{Binding Cat.CharismaCurrent}" Width="62" />
+              <DataGridTextColumn Header="LCK C" Binding="{Binding Cat.LuckCurrent}" Width="62" />
             </DataGrid.Columns>
           </DataGrid>
           <TextBlock Text="Team excludes breeders and retired cats." />
@@ -124,30 +139,61 @@
                     IsReadOnly="True"
                     Sorting="OnBreedingPoolSorting">
             <DataGrid.Columns>
-              <DataGridTemplateColumn Header="Name (#{ID})" Width="230" SortMemberPath="NameWithId">
+              <DataGridTemplateColumn Header="Name" Width="260" SortMemberPath="NameWithId">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                      <TextBlock Text="{Binding Cat.Name}" />
-                      <TextBlock Classes="muted"
-                                 FontSize="11"
-                                 Text="{Binding Id, StringFormat=(#{0})}" />
-                    </StackPanel>
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="{Binding Cat.Name}" />
+                        <TextBlock Classes="muted"
+                                   FontSize="11"
+                                   Text="{Binding Cat.Id, StringFormat=(#{0})}" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1"
+                                 Margin="8,0,0,0"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Center"
+                                 IsVisible="{Binding Cat.IsRetired}"
+                                 Text="♛"
+                                 FontSize="14"
+                                 Foreground="#F6C84B" />
+                    </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
-              <DataGridTextColumn Header="STR" Binding="{Binding StrMark}" Width="58" SortMemberPath="StrSortKey" />
-              <DataGridTextColumn Header="DEX" Binding="{Binding DexMark}" Width="58" SortMemberPath="DexSortKey" />
-              <DataGridTextColumn Header="STA" Binding="{Binding StaMark}" Width="58" SortMemberPath="StaSortKey" />
-              <DataGridTextColumn Header="INT" Binding="{Binding IntMark}" Width="58" SortMemberPath="IntSortKey" />
-              <DataGridTextColumn Header="SPD" Binding="{Binding SpdMark}" Width="58" SortMemberPath="SpdSortKey" />
-              <DataGridTextColumn Header="CHA" Binding="{Binding ChaMark}" Width="58" SortMemberPath="ChaSortKey" />
-              <DataGridTextColumn Header="LUK" Binding="{Binding LukMark}" Width="58" SortMemberPath="LukSortKey" />
-              <DataGridTextColumn Header="#7s" Binding="{Binding Cat.BaseSevenCount}" Width="70" SortMemberPath="Cat.BaseSevenCount" />
-              <DataGridTextColumn Header="#Partners" Binding="{Binding CompatiblePartners}" Width="98" SortMemberPath="CompatiblePartners" />
-              <DataGridTextColumn Header="Base &#x03BC;" Binding="{Binding Cat.BaseAverage}" Width="88" SortMemberPath="Cat.BaseAverage" />
-              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding Cat.CurrentAverage}" Width="108" SortMemberPath="Cat.CurrentAverage" />
-              <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" SortMemberPath="Reason" />
+              <DataGridTemplateColumn Header="Gender" Width="74" SortMemberPath="GenderSortKey">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Cat.Gender, Converter={StaticResource GenderIconConverter}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="Sexuality" Width="86" SortMemberPath="SexualitySortKey">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Cat.Sexuality, Converter={StaticResource SexualityIconConverter}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="# Partners" Binding="{Binding CompatiblePartners}" Width="88" SortMemberPath="CompatiblePartners" />
+              <DataGridTextColumn Header="#7s" Binding="{Binding Cat.BaseSevenCount}" Width="62" SortMemberPath="Cat.BaseSevenCount" />
+              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding Cat.CurrentAverage, StringFormat={}{0:F2}}" Width="98" SortMemberPath="Cat.CurrentAverage" />
+              <DataGridTextColumn Header="Base &#x03BC;" Binding="{Binding Cat.BaseAverage, StringFormat={}{0:F2}}" Width="84" SortMemberPath="Cat.BaseAverage" />
+              <DataGridTextColumn Header="STR" Binding="{Binding StrMark}" Width="56" SortMemberPath="StrSortKey" />
+              <DataGridTextColumn Header="DEX" Binding="{Binding DexMark}" Width="56" SortMemberPath="DexSortKey" />
+              <DataGridTextColumn Header="STA" Binding="{Binding StaMark}" Width="56" SortMemberPath="StaSortKey" />
+              <DataGridTextColumn Header="INT" Binding="{Binding IntMark}" Width="56" SortMemberPath="IntSortKey" />
+              <DataGridTextColumn Header="SPD" Binding="{Binding SpdMark}" Width="56" SortMemberPath="SpdSortKey" />
+              <DataGridTextColumn Header="CHA" Binding="{Binding ChaMark}" Width="56" SortMemberPath="ChaSortKey" />
+              <DataGridTextColumn Header="LCK" Binding="{Binding LukMark}" Width="56" SortMemberPath="LukSortKey" />
             </DataGrid.Columns>
           </DataGrid>
         </StackPanel>
@@ -160,10 +206,66 @@
                     AutoGenerateColumns="False"
                     IsReadOnly="True">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="60" />
-              <DataGridTextColumn Header="Name" Binding="{Binding Cat.Name}" Width="180" />
-              <DataGridTextColumn Header="C Avg" Binding="{Binding Cat.CurrentAverage}" Width="90" />
-              <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" />
+              <DataGridTemplateColumn Header="Name" Width="260" SortMemberPath="Cat.Name">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="{Binding Cat.Name}" />
+                        <TextBlock Classes="muted"
+                                   FontSize="11"
+                                   Text="{Binding Cat.Id, StringFormat=(#{0})}" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1"
+                                 Margin="8,0,0,0"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Center"
+                                 IsVisible="{Binding Cat.IsRetired}"
+                                 Text="♛"
+                                 FontSize="14"
+                                 Foreground="#F6C84B" />
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="Gender" Width="74" SortMemberPath="Cat.Gender">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Cat.Gender, Converter={StaticResource GenderIconConverter}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="Sexuality" Width="86" SortMemberPath="Cat.Sexuality">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Cat.Sexuality, Converter={StaticResource SexualityIconConverter}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding Cat.CurrentAverage, StringFormat={}{0:F2}}" Width="98" SortMemberPath="Cat.CurrentAverage" />
+              <DataGridTextColumn Header="Base &#x03BC;" Binding="{Binding Cat.BaseAverage, StringFormat={}{0:F2}}" Width="84" SortMemberPath="Cat.BaseAverage" />
+              <DataGridTextColumn Header="STR C" Binding="{Binding Cat.StrengthCurrent}" Width="62" SortMemberPath="Cat.StrengthCurrent" />
+              <DataGridTextColumn Header="STR B" Binding="{Binding Cat.StrengthBase}" Width="62" SortMemberPath="Cat.StrengthBase" />
+              <DataGridTextColumn Header="DEX C" Binding="{Binding Cat.DexterityCurrent}" Width="62" SortMemberPath="Cat.DexterityCurrent" />
+              <DataGridTextColumn Header="DEX B" Binding="{Binding Cat.DexterityBase}" Width="62" SortMemberPath="Cat.DexterityBase" />
+              <DataGridTextColumn Header="STA C" Binding="{Binding Cat.StaminaCurrent}" Width="62" SortMemberPath="Cat.StaminaCurrent" />
+              <DataGridTextColumn Header="STA B" Binding="{Binding Cat.StaminaBase}" Width="62" SortMemberPath="Cat.StaminaBase" />
+              <DataGridTextColumn Header="INT C" Binding="{Binding Cat.IntellectCurrent}" Width="62" SortMemberPath="Cat.IntellectCurrent" />
+              <DataGridTextColumn Header="INT B" Binding="{Binding Cat.IntellectBase}" Width="62" SortMemberPath="Cat.IntellectBase" />
+              <DataGridTextColumn Header="SPD C" Binding="{Binding Cat.SpeedCurrent}" Width="62" SortMemberPath="Cat.SpeedCurrent" />
+              <DataGridTextColumn Header="SPD B" Binding="{Binding Cat.SpeedBase}" Width="62" SortMemberPath="Cat.SpeedBase" />
+              <DataGridTextColumn Header="CHA C" Binding="{Binding Cat.CharismaCurrent}" Width="62" SortMemberPath="Cat.CharismaCurrent" />
+              <DataGridTextColumn Header="CHA B" Binding="{Binding Cat.CharismaBase}" Width="62" SortMemberPath="Cat.CharismaBase" />
+              <DataGridTextColumn Header="LCK C" Binding="{Binding Cat.LuckCurrent}" Width="62" SortMemberPath="Cat.LuckCurrent" />
+              <DataGridTextColumn Header="LCK B" Binding="{Binding Cat.LuckBase}" Width="62" SortMemberPath="Cat.LuckBase" />
             </DataGrid.Columns>
           </DataGrid>
         </StackPanel>
@@ -181,47 +283,66 @@
                     HeadersVisibility="Column"
                     HorizontalScrollBarVisibility="Auto">
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="140" SortMemberPath="Name" />
-              <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" SortMemberPath="Id" />
-              <DataGridTemplateColumn Header="R" Width="60" SortMemberPath="IsRetired">
+              <DataGridTemplateColumn Header="Name" Width="260" SortMemberPath="Name">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <Border Classes="badge retired" IsVisible="{Binding IsRetired}">
-                      <TextBlock Classes="badge-label" Text="R" />
-                    </Border>
+                    <Grid ColumnDefinitions="*,Auto">
+                      <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Classes="muted"
+                                   FontSize="11"
+                                   Text="{Binding Id, StringFormat=(#{0})}" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="1"
+                                 Margin="8,0,0,0"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Center"
+                                 IsVisible="{Binding IsRetired}"
+                                 Text="♛"
+                                 FontSize="14"
+                                 Foreground="#F6C84B" />
+                    </Grid>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="G" Width="52">
+              <DataGridTemplateColumn Header="Gender" Width="74" SortMemberPath="Gender">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <badges:GenderBadgeView Gender="{Binding Gender}" HorizontalAlignment="Center" />
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Gender, Converter={StaticResource GenderIconConverter}}" />
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="S" Width="52">
+              <DataGridTemplateColumn Header="Sexuality" Width="86" SortMemberPath="Sexuality">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <badges:SexualityBadgeView Sexuality="{Binding Sexuality}" HorizontalAlignment="Center" />
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Sexuality, Converter={StaticResource SexualityIconConverter}}" />
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
-              <DataGridTextColumn Header="Str B" Binding="{Binding StrengthBase}" Width="70" />
-              <DataGridTextColumn Header="Str C" Binding="{Binding StrengthCurrent}" Width="70" />
-              <DataGridTextColumn Header="Dex B" Binding="{Binding DexterityBase}" Width="70" />
-              <DataGridTextColumn Header="Dex C" Binding="{Binding DexterityCurrent}" Width="70" />
-              <DataGridTextColumn Header="Sta B" Binding="{Binding StaminaBase}" Width="70" />
-              <DataGridTextColumn Header="Sta C" Binding="{Binding StaminaCurrent}" Width="70" />
-              <DataGridTextColumn Header="Int B" Binding="{Binding IntellectBase}" Width="70" />
-              <DataGridTextColumn Header="Int C" Binding="{Binding IntellectCurrent}" Width="70" />
-              <DataGridTextColumn Header="Spd B" Binding="{Binding SpeedBase}" Width="70" />
-              <DataGridTextColumn Header="Spd C" Binding="{Binding SpeedCurrent}" Width="70" />
-              <DataGridTextColumn Header="Cha B" Binding="{Binding CharismaBase}" Width="70" />
-              <DataGridTextColumn Header="Cha C" Binding="{Binding CharismaCurrent}" Width="70" />
-              <DataGridTextColumn Header="Lck B" Binding="{Binding LuckBase}" Width="70" />
-              <DataGridTextColumn Header="Lck C" Binding="{Binding LuckCurrent}" Width="70" />
-              <DataGridTextColumn Header="B Avg" Binding="{Binding BaseAverage}" Width="70" />
-              <DataGridTextColumn Header="C Avg" Binding="{Binding CurrentAverage}" Width="70" />
+              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding CurrentAverage, StringFormat={}{0:F2}}" Width="98" SortMemberPath="CurrentAverage" />
+              <DataGridTextColumn Header="Base &#x03BC;" Binding="{Binding BaseAverage, StringFormat={}{0:F2}}" Width="84" SortMemberPath="BaseAverage" />
+              <DataGridTextColumn Header="STR C" Binding="{Binding StrengthCurrent}" Width="62" SortMemberPath="StrengthCurrent" />
+              <DataGridTextColumn Header="STR B" Binding="{Binding StrengthBase}" Width="62" SortMemberPath="StrengthBase" />
+              <DataGridTextColumn Header="DEX C" Binding="{Binding DexterityCurrent}" Width="62" SortMemberPath="DexterityCurrent" />
+              <DataGridTextColumn Header="DEX B" Binding="{Binding DexterityBase}" Width="62" SortMemberPath="DexterityBase" />
+              <DataGridTextColumn Header="STA C" Binding="{Binding StaminaCurrent}" Width="62" SortMemberPath="StaminaCurrent" />
+              <DataGridTextColumn Header="STA B" Binding="{Binding StaminaBase}" Width="62" SortMemberPath="StaminaBase" />
+              <DataGridTextColumn Header="INT C" Binding="{Binding IntellectCurrent}" Width="62" SortMemberPath="IntellectCurrent" />
+              <DataGridTextColumn Header="INT B" Binding="{Binding IntellectBase}" Width="62" SortMemberPath="IntellectBase" />
+              <DataGridTextColumn Header="SPD C" Binding="{Binding SpeedCurrent}" Width="62" SortMemberPath="SpeedCurrent" />
+              <DataGridTextColumn Header="SPD B" Binding="{Binding SpeedBase}" Width="62" SortMemberPath="SpeedBase" />
+              <DataGridTextColumn Header="CHA C" Binding="{Binding CharismaCurrent}" Width="62" SortMemberPath="CharismaCurrent" />
+              <DataGridTextColumn Header="CHA B" Binding="{Binding CharismaBase}" Width="62" SortMemberPath="CharismaBase" />
+              <DataGridTextColumn Header="LCK C" Binding="{Binding LuckCurrent}" Width="62" SortMemberPath="LuckCurrent" />
+              <DataGridTextColumn Header="LCK B" Binding="{Binding LuckBase}" Width="62" SortMemberPath="LuckBase" />
             </DataGrid.Columns>
           </DataGrid>
         </StackPanel>

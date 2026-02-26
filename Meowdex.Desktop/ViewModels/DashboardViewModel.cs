@@ -38,6 +38,10 @@ public sealed class DashboardViewModel : ViewModelBase
     public int TotalCats => Cats.Count;
     public int RetiredCount => Cats.Count(cat => cat.IsRetired);
     public int NaturalSevenCount => Cats.Count(cat => cat.HasNaturalSeven);
+    public string NaturalSevenSummary =>
+        TotalCats == 0
+            ? "Natural 7 cats: 0/0 (0%)"
+            : $"Natural 7 cats: {NaturalSevenCount}/{TotalCats} ({(NaturalSevenCount * 100.0 / TotalCats):F0}%)";
     public int CoveredSevenCount => CountBits(Plan.CoveredMask);
     public double CoveragePercent => CoveredSevenCount / 7.0 * 100.0;
     public string CoverageSummary => $"{CoveredSevenCount}/7 stats covered";
@@ -154,6 +158,7 @@ public sealed class DashboardViewModel : ViewModelBase
         RaisePropertyChanged(nameof(TotalCats));
         RaisePropertyChanged(nameof(RetiredCount));
         RaisePropertyChanged(nameof(NaturalSevenCount));
+        RaisePropertyChanged(nameof(NaturalSevenSummary));
         RebuildPlan();
     }
 
@@ -188,6 +193,8 @@ public sealed class DashboardViewModel : ViewModelBase
         Func<BreedingPoolEntry, object?> keySelector = sortPath switch
         {
             "NameWithId" => entry => entry.Cat.Name,
+            "GenderSortKey" => entry => entry.GenderSortKey,
+            "SexualitySortKey" => entry => entry.SexualitySortKey,
             "StrSortKey" => entry => entry.StrSortKey,
             "DexSortKey" => entry => entry.DexSortKey,
             "StaSortKey" => entry => entry.StaSortKey,

@@ -12,7 +12,7 @@ public sealed class BreedingAdvisorService
         var backfillsPerMask = Math.Max(0, cfg.BackfillsPerMask);
         var minSevenCount = Math.Max(0, cfg.MinSevenCount);
 
-        var activeCats = cats.Where(cat => !cat.IsRetired).ToList();
+        var activeCats = cats.ToList();
 
         var compatibleCounts = activeCats.ToDictionary(
             cat => cat.Id,
@@ -65,6 +65,9 @@ public sealed class BreedingAdvisorService
         }
 
         var breedingIds = breedingPool.Select(cat => cat.Id).ToHashSet();
+        var poolCompatibleCounts = breedingPool.ToDictionary(
+            cat => cat.Id,
+            cat => breedingPool.Count(other => other.Id != cat.Id && CanBreed(cat, other)));
 
         var additionalDiversityCats = breedingPool
             .Where(cat => !topCats.Contains(cat))
@@ -74,7 +77,7 @@ public sealed class BreedingAdvisorService
             .Select(cat => new BreedingPoolEntry(
                 cat,
                 FormatMask(cat.SevenMask),
-                compatibleCounts[cat.Id],
+                poolCompatibleCounts[cat.Id],
                 topCats.Contains(cat) ? "Top-mask priority" : "Diversity backfill"))
             .ToList();
 
@@ -124,6 +127,14 @@ public sealed record BreedingPoolEntry(
 {
     public string NameWithId => Cat.Name;
     public int Id => Cat.Id;
+    public string GenderSortKey => Cat.Gender.ToString();
+    public string SexualitySortKey => Cat.Sexuality switch
+    {
+        CatSexuality.Bi => "Bisexual",
+        CatSexuality.GayLesbian => "Gay / Lesbian",
+        CatSexuality.Straight => "Straight",
+        _ => string.Empty
+    };
 
     public bool Str => HasBit(Cat.SevenMask, 0);
     public bool Dex => HasBit(Cat.SevenMask, 1);
