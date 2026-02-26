@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Meowdex.Core.Models;
 using Meowdex.Core.Services;
+using Meowdex.Desktop.Services;
 using Meowdex.Desktop.ViewModels;
 
 namespace Meowdex.Desktop;
@@ -8,12 +9,23 @@ namespace Meowdex.Desktop;
 public static class AppServices
 {
     private static readonly SemaphoreSlim OverlayGate = new(1, 1);
+    private static readonly PlayerProfileStore ProfileStore = new();
+    private static PlayerProfileState _profileState;
 
     public static CatRosterService Roster { get; } = new();
     public static BreedingAdvisorService Advisor { get; } = new();
     public static Window? MainWindow { get; set; }
     public static OverlayHostViewModel OverlayHost { get; set; } = new();
-    public static DashboardConfig SettingsConfig { get; set; } = new(3, 1, 0);
+    public static int ActiveProfile { get; private set; }
+    public static DashboardConfig SettingsConfig { get; private set; } = new(3, 1, 0);
+
+    static AppServices()
+    {
+        _profileState = ProfileStore.Load();
+        ActiveProfile = NormalizeProfile(_profileState.ActiveProfile);
+        SettingsConfig = _profileState.GetConfig(ActiveProfile);
+        Roster.SetActiveProfile(ActiveProfile);
+    }
 
     public static async Task<bool> ConfirmAsync(string message)
     {
@@ -30,9 +42,26 @@ public static class AppServices
         return await ShowOverlayAsync<CatProfile?>(tcs => new AddCatOverlayViewModel(tcs));
     }
 
-    public static async Task<DashboardConfig?> ShowSettingsAsync(DashboardConfig current)
+    public static DashboardConfig GetProfileConfig(int profileId)
     {
-        return await ShowOverlayAsync<DashboardConfig?>(tcs => new SettingsOverlayViewModel(current, tcs));
+        return _profileState.GetConfig(NormalizeProfile(profileId));
+    }
+
+    public static void ApplySettings(SettingsResult result)
+    {
+        var profileId = NormalizeProfile(result.ProfileId);
+        _profileState.ActiveProfile = profileId;
+        _profileState.SetConfig(profileId, result.Config);
+        ProfileStore.Save(_profileState);
+
+        ActiveProfile = profileId;
+        SettingsConfig = result.Config;
+        Roster.SetActiveProfile(profileId);
+    }
+
+    public static async Task<SettingsResult?> ShowSettingsAsync(DashboardConfig current)
+    {
+        return await ShowOverlayAsync<SettingsResult?>(tcs => new SettingsOverlayViewModel(current, ActiveProfile, tcs));
     }
 
     public static async Task<EditCatResult?> ShowEditCatAsync(CatProfile cat)
@@ -57,4 +86,6 @@ public static class AppServices
             OverlayGate.Release();
         }
     }
+
+    private static int NormalizeProfile(int profileId) => profileId is >= 1 and <= 3 ? profileId : 1;
 }

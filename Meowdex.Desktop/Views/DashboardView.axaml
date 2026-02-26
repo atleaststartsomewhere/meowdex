@@ -133,6 +133,14 @@
         <StackPanel Spacing="10"
                     IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}">
           <TextBlock Text="Breeding Pool Roster" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Classes="muted"
+                     FontSize="11"
+                     Text="{Binding TopCatCount, StringFormat=Top breeders: {0}}"
+                     />
+          <TextBlock Classes="muted"
+                     FontSize="11"
+                     Text="{Binding BackfillsPerMask, StringFormat=Backfill partners per mask: {0}}"
+                     />
           <DataGrid x:Name="BreedingPoolGrid"
                     ItemsSource="{Binding Plan.BreedingPool}"
                     AutoGenerateColumns="False"

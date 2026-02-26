@@ -14,6 +14,18 @@
         </Grid>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Spacing="8">
+          <StackPanel Spacing="4" Margin="0,0,0,8">
+            <TextBlock Text="Save Profile" Classes="muted" FontSize="11" />
+            <ComboBox ItemsSource="{Binding ProfileOptions}"
+                      SelectedItem="{Binding SelectedProfile}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding ., StringFormat=Profile {0}}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+
           <ToggleButton Classes="settings-tab"
                         IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Configuration, Mode=OneWay}"
                         Command="{Binding SetSectionCommand}"

@@ -53,8 +53,8 @@ public sealed partial class DashboardView : UserControl
             var result = await AppServices.ShowSettingsAsync(new DashboardConfig(vm.TopCatCount, vm.BackfillsPerMask, vm.MinMaskSevenCount));
             if (result is not null)
             {
-                AppServices.SettingsConfig = result;
-                vm.ApplyConfig(result);
+                AppServices.ApplySettings(result);
+                vm.ApplyConfig(AppServices.SettingsConfig);
                 await vm.RefreshAsync();
                 StabilizeFullRosterGridLayout();
             }

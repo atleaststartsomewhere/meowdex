@@ -4,12 +4,13 @@ namespace Meowdex.Desktop.ViewModels;
 
 public sealed class SettingsOverlayViewModel : OverlayViewModelBase
 {
-    private readonly TaskCompletionSource<DashboardConfig?> _tcs;
+    private readonly TaskCompletionSource<SettingsResult?> _tcs;
     private SettingsSection _activeSection = SettingsSection.Configuration;
     private string _importInput = string.Empty;
     private ImportSummaryData? _importSummary;
+    private int _selectedProfile;
 
-    public SettingsOverlayViewModel(DashboardConfig current, TaskCompletionSource<DashboardConfig?> tcs)
+    public SettingsOverlayViewModel(DashboardConfig current, int activeProfile, TaskCompletionSource<SettingsResult?> tcs)
     {
         _tcs = tcs;
         Config = new ConfigDialogModel
@@ -18,6 +19,7 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
             BackfillsPerMask = current.BackfillsPerMask,
             MinMaskSevenCount = current.MinMaskSevenCount
         };
+        _selectedProfile = activeProfile is >= 1 and <= 3 ? activeProfile : 1;
 
         ApplyCommand = new RelayCommand(Apply);
         CloseCommand = new RelayCommand(Cancel);
@@ -30,6 +32,7 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
     public RelayCommand CloseCommand { get; }
     public RelayCommand SetSectionCommand { get; }
     public AsyncRelayCommand RunImportCommand { get; }
+    public IReadOnlyList<int> ProfileOptions { get; } = [1, 2, 3];
 
     public SettingsSection ActiveSection
     {
@@ -55,6 +58,23 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
         private set => SetProperty(ref _importSummary, value);
     }
 
+    public int SelectedProfile
+    {
+        get => _selectedProfile;
+        set
+        {
+            if (!SetProperty(ref _selectedProfile, value))
+            {
+                return;
+            }
+
+            var profileConfig = AppServices.GetProfileConfig(_selectedProfile);
+            Config.TopCatCount = profileConfig.TopCatCount;
+            Config.BackfillsPerMask = profileConfig.BackfillsPerMask;
+            Config.MinMaskSevenCount = profileConfig.MinMaskSevenCount;
+        }
+    }
+
     public string BuildIdentity
     {
         get
@@ -73,7 +93,9 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
 
     private void Apply()
     {
-        _tcs.TrySetResult(new DashboardConfig(Config.TopCatCount, Config.BackfillsPerMask, Config.MinMaskSevenCount));
+        _tcs.TrySetResult(new SettingsResult(
+            SelectedProfile,
+            new DashboardConfig(Config.TopCatCount, Config.BackfillsPerMask, Config.MinMaskSevenCount)));
         CloseOverlay();
     }
 

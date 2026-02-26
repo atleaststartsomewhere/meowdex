@@ -11,7 +11,14 @@ public sealed class CatRosterService
     };
 
     private readonly SemaphoreSlim _mutex = new(1, 1);
-    private readonly string _storePath = ResolveStorePath();
+    private int _activeProfile = 1;
+
+    public int ActiveProfile => _activeProfile;
+
+    public void SetActiveProfile(int profileId)
+    {
+        _activeProfile = NormalizeProfile(profileId);
+    }
 
     public async Task<IReadOnlyList<CatProfile>> GetCatsAsync()
     {
@@ -135,33 +142,61 @@ public sealed class CatRosterService
 
     private async Task<IReadOnlyList<CatProfile>> LoadUnsafeAsync()
     {
-        if (!File.Exists(_storePath))
+        var storePath = ResolveStorePath(_activeProfile);
+        EnsureLegacyProfileOneMigration(_activeProfile, storePath);
+        if (!File.Exists(storePath))
         {
             return [];
         }
 
-        await using var stream = File.OpenRead(_storePath);
+        await using var stream = File.OpenRead(storePath);
         var cats = await JsonSerializer.DeserializeAsync<List<CatProfile>>(stream, JsonOptions);
         return cats ?? [];
     }
 
     private async Task SaveUnsafeAsync(IReadOnlyList<CatProfile> cats)
     {
-        var folder = Path.GetDirectoryName(_storePath);
+        var storePath = ResolveStorePath(_activeProfile);
+        var folder = Path.GetDirectoryName(storePath);
         if (!string.IsNullOrWhiteSpace(folder))
         {
             Directory.CreateDirectory(folder);
         }
 
-        await using var stream = File.Create(_storePath);
+        await using var stream = File.Create(storePath);
         await JsonSerializer.SerializeAsync(stream, cats, JsonOptions);
     }
 
-    private static string ResolveStorePath()
+    private static string ResolveStorePath(int profileId)
     {
         var root = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var folder = Path.Combine(root, "Meowdex");
+        var folder = Path.Combine(root, "Meowdex", $"Profile{NormalizeProfile(profileId)}");
         return Path.Combine(folder, "cats.json");
+    }
+
+    private static int NormalizeProfile(int profileId) => profileId is >= 1 and <= 3 ? profileId : 1;
+
+    private static void EnsureLegacyProfileOneMigration(int profileId, string targetStorePath)
+    {
+        if (NormalizeProfile(profileId) != 1 || File.Exists(targetStorePath))
+        {
+            return;
+        }
+
+        var root = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var legacyPath = Path.Combine(root, "Meowdex", "cats.json");
+        if (!File.Exists(legacyPath))
+        {
+            return;
+        }
+
+        var folder = Path.GetDirectoryName(targetStorePath);
+        if (!string.IsNullOrWhiteSpace(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
+
+        File.Copy(legacyPath, targetStorePath, overwrite: false);
     }
 
     private static CatProfile Sanitize(CatProfile cat)

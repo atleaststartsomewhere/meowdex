@@ -68,7 +68,11 @@ public sealed partial class ManageCatsView : UserControl
             var result = await AppServices.ShowSettingsAsync(AppServices.SettingsConfig);
             if (result is not null)
             {
-                AppServices.SettingsConfig = result;
+                AppServices.ApplySettings(result);
+                if (DataContext is ManageCatsViewModel vm)
+                {
+                    await vm.RefreshAsync();
+                }
             }
         }
         catch (Exception ex)
