@@ -1,0 +1,10 @@
+{
+  "version": "0.0.2",
+  "releaseNotes": "Testing updater system",
+  "downloads": {
+    "win-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/0.0.2/Meowdex.Desktop-win-x64-Release.zip",
+    "linux-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/0.0.2/Meowdex.Desktop-linux-x64-Release.zip",
+    "osx-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/0.0.2/Meowdex.Desktop-osx-x64-Release.zip",
+    "osx-arm64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/0.0.2/Meowdex.Desktop-osx-arm64-Release.zip"
+  }
+}
