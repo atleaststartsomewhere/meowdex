@@ -72,6 +72,8 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
             Config.TopCatCount = profileConfig.TopCatCount;
             Config.BackfillsPerMask = profileConfig.BackfillsPerMask;
             Config.MinMaskSevenCount = profileConfig.MinMaskSevenCount;
+
+            _ = AppServices.SwitchActiveProfileAsync(_selectedProfile);
         }
     }
 

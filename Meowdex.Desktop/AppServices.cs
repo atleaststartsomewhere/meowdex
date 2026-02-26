@@ -47,6 +47,23 @@ public static class AppServices
         return _profileState.GetConfig(NormalizeProfile(profileId));
     }
 
+    public static async Task SwitchActiveProfileAsync(int profileId)
+    {
+        var normalizedProfile = NormalizeProfile(profileId);
+        _profileState.ActiveProfile = normalizedProfile;
+        ProfileStore.Save(_profileState);
+
+        ActiveProfile = normalizedProfile;
+        SettingsConfig = _profileState.GetConfig(normalizedProfile);
+        Roster.SetActiveProfile(normalizedProfile);
+
+        if (MainWindow?.DataContext is MainViewModel main)
+        {
+            await main.Dashboard.RefreshAsync();
+            await main.ManageCats.RefreshAsync();
+        }
+    }
+
     public static void ApplySettings(SettingsResult result)
     {
         var profileId = NormalizeProfile(result.ProfileId);
