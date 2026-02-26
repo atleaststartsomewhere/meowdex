@@ -7,6 +7,11 @@ namespace Meowdex.Desktop.Services;
 
 public sealed class AppUpdateService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly HttpClient _httpClient;
     private readonly string _manifestUrl;
     private readonly object _sync = new();
@@ -57,7 +62,7 @@ public sealed class AppUpdateService
             }
 
             var json = await response.Content.ReadAsStringAsync(ct);
-            var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
+            var manifest = JsonSerializer.Deserialize<UpdateManifest>(json, JsonOptions);
             if (manifest is null || string.IsNullOrWhiteSpace(manifest.Version))
             {
                 return CacheResult(new UpdateCheckResult(
