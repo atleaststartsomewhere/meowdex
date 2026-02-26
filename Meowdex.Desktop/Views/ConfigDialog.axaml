@@ -15,7 +15,7 @@
     </StackPanel>
 
     <StackPanel Spacing="6">
-      <TextBlock Text="Desired Backfills Per Mask" />
+      <TextBlock Text="Desired Partners Per Top Breeder" />
       <NumericUpDown Minimum="0" Maximum="20" Value="{Binding BackfillsPerMask}" />
     </StackPanel>
 

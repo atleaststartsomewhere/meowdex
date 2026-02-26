@@ -9,7 +9,7 @@ public sealed class BreedingAdvisorService
     {
         var cfg = options ?? new BreedingPlanOptions();
         var topCount = Math.Max(1, cfg.TopCatCount);
-        var backfillsPerMask = Math.Max(0, cfg.BackfillsPerMask);
+        var partnersPerTopCat = Math.Max(0, cfg.BackfillsPerMask);
         var minSevenCount = Math.Max(0, cfg.MinSevenCount);
 
         var activeCats = cats.ToList();
@@ -33,35 +33,23 @@ public sealed class BreedingAdvisorService
 
         var breedingPool = topCats.ToList();
         var coveredMask = topCats.Aggregate(0, (mask, cat) => mask | cat.SevenMask);
+        var partnerRecommendations = BuildTopBreederPartnerRecommendations(
+            topCats,
+            activeCats,
+            partnersPerTopCat,
+            coveredMask);
 
-        var topMasks = topCats.Select(cat => cat.SevenMask).ToHashSet();
-        var backfillByMask = new Dictionary<int, int>();
+        var partnerCats = partnerRecommendations
+            .SelectMany(x => x.Partners)
+            .Select(x => x.Partner)
+            .DistinctBy(cat => cat.Id)
+            .Where(cat => topCats.All(top => top.Id != cat.Id))
+            .ToList();
 
-        if (backfillsPerMask > 0)
+        foreach (var partner in partnerCats)
         {
-            foreach (var cat in rankedForBreeding.Skip(topCount))
-            {
-                var mask = cat.SevenMask;
-                if (topMasks.Contains(mask))
-                {
-                    continue;
-                }
-
-                if (!AddsNovelCoverage(coveredMask, mask))
-                {
-                    continue;
-                }
-
-                backfillByMask.TryGetValue(mask, out var currentCount);
-                if (currentCount >= backfillsPerMask)
-                {
-                    continue;
-                }
-
-                breedingPool.Add(cat);
-                backfillByMask[mask] = currentCount + 1;
-                coveredMask |= mask;
-            }
+            breedingPool.Add(partner);
+            coveredMask |= partner.SevenMask;
         }
 
         var breedingIds = breedingPool.Select(cat => cat.Id).ToHashSet();
@@ -69,16 +57,17 @@ public sealed class BreedingAdvisorService
             cat => cat.Id,
             cat => breedingPool.Count(other => other.Id != cat.Id && CanBreed(cat, other)));
 
-        var additionalDiversityCats = breedingPool
-            .Where(cat => !topCats.Contains(cat))
-            .ToList();
+        var additionalDiversityCats = partnerCats;
+        var partnerReasons = BuildPartnerReasonMap(partnerRecommendations);
 
         var breedingEntries = breedingPool
             .Select(cat => new BreedingPoolEntry(
                 cat,
                 FormatMask(cat.SevenMask),
                 poolCompatibleCounts[cat.Id],
-                topCats.Contains(cat) ? "Top-mask priority" : "Diversity backfill"))
+                topCats.Contains(cat)
+                    ? "Top-mask priority"
+                    : partnerReasons.GetValueOrDefault(cat.Id, "Top-breeder partner recommendation")))
             .ToList();
 
         var generalPopulation = cats
@@ -93,17 +82,23 @@ public sealed class BreedingAdvisorService
 
         return new BreedingPlanResult(
             topCount,
-            backfillsPerMask,
+            partnersPerTopCat,
             breedingEntries,
             topCats,
             additionalDiversityCats,
             generalPopulation,
-            coveredMask);
+            coveredMask,
+            partnerRecommendations);
     }
 
     public static bool CanBreed(CatProfile a, CatProfile b)
     {
-        return a.Id != b.Id && a.Gender != b.Gender;
+        if (a.Id == b.Id)
+        {
+            return false;
+        }
+
+        return IsAttractedTo(a, b.Gender) && IsAttractedTo(b, a.Gender);
     }
 
     public static string FormatMask(int mask)
@@ -114,6 +109,142 @@ public sealed class BreedingAdvisorService
     private static bool AddsNovelCoverage(int coveredMask, int candidateMask)
     {
         return (coveredMask | candidateMask) != coveredMask;
+    }
+
+    private static IReadOnlyList<TopBreederRecommendation> BuildTopBreederPartnerRecommendations(
+        IReadOnlyList<CatProfile> topCats,
+        IReadOnlyList<CatProfile> allCats,
+        int partnersPerTopCat,
+        int initialCoveredMask)
+    {
+        if (partnersPerTopCat == 0 || topCats.Count == 0)
+        {
+            return [];
+        }
+
+        var coveredMask = initialCoveredMask;
+        var partnerUseCounts = new Dictionary<int, int>();
+        var recommendations = new List<TopBreederRecommendation>();
+
+        foreach (var breeder in topCats)
+        {
+            var selected = new List<PartnerRecommendation>();
+
+            for (var i = 0; i < partnersPerTopCat; i++)
+            {
+                var best = allCats
+                    .Where(candidate => candidate.Id != breeder.Id && selected.All(x => x.Partner.Id != candidate.Id))
+                    .Select(candidate => new
+                    {
+                        Partner = candidate,
+                        Score = ScorePair(breeder, candidate, coveredMask, partnerUseCounts.GetValueOrDefault(candidate.Id))
+                    })
+                    .Where(x => x.Score > 0)
+                    .OrderByDescending(x => x.Score)
+                    .ThenByDescending(x => x.Partner.BaseSevenCount)
+                    .ThenByDescending(x => x.Partner.BaseAverage)
+                    .ThenByDescending(x => x.Partner.Id)
+                    .FirstOrDefault();
+
+                if (best is null)
+                {
+                    break;
+                }
+
+                var novelMask = best.Partner.SevenMask & ~coveredMask;
+                var relationMask = best.Partner.SevenMask & ~breeder.SevenMask;
+                selected.Add(new PartnerRecommendation(best.Partner, best.Score, novelMask, relationMask));
+
+                coveredMask |= best.Partner.SevenMask;
+                partnerUseCounts[best.Partner.Id] = partnerUseCounts.GetValueOrDefault(best.Partner.Id) + 1;
+            }
+
+            recommendations.Add(new TopBreederRecommendation(breeder, selected));
+        }
+
+        return recommendations;
+    }
+
+    private static Dictionary<int, string> BuildPartnerReasonMap(IReadOnlyList<TopBreederRecommendation> recommendations)
+    {
+        var byPartner = recommendations
+            .SelectMany(rec => rec.Partners.Select(partner => (Breeder: rec.Breeder, Partner: partner)))
+            .GroupBy(x => x.Partner.Partner.Id)
+            .ToDictionary(
+                g => g.Key,
+                g =>
+                {
+                    var breeders = g.Select(x => $"#{x.Breeder.Id}").Distinct().ToList();
+                    return $"Partner for {string.Join(", ", breeders)}";
+                });
+
+        return byPartner;
+    }
+
+    private static double ScorePair(CatProfile breeder, CatProfile partner, int coveredMask, int reuseCount)
+    {
+        if (!CanBreed(breeder, partner))
+        {
+            return 0;
+        }
+
+        var novelPoolBits = CountBits(partner.SevenMask & ~coveredMask);
+        var novelBreederBits = CountBits(partner.SevenMask & ~breeder.SevenMask);
+        var quality = partner.BaseAverage / 7.0;
+        var reusePenalty = reuseCount * 0.75;
+
+        return
+            (novelPoolBits * 4.0) +
+            (novelBreederBits * 2.0) +
+            (partner.BaseSevenCount * 0.5) +
+            (quality * 0.5) -
+            reusePenalty;
+    }
+
+    private static bool IsAttractedTo(CatProfile cat, CatGender targetGender)
+    {
+        return cat.Sexuality switch
+        {
+            CatSexuality.Bi => true,
+            CatSexuality.Straight => IsStraightAttractedTo(cat.Gender, targetGender),
+            CatSexuality.GayLesbian => IsGayAttractedTo(cat.Gender, targetGender),
+            _ => false
+        };
+    }
+
+    private static bool IsStraightAttractedTo(CatGender ownGender, CatGender targetGender)
+    {
+        return ownGender switch
+        {
+            CatGender.Male => targetGender is CatGender.Female or CatGender.Fluid,
+            CatGender.Female => targetGender is CatGender.Male or CatGender.Fluid,
+            CatGender.Fluid => targetGender is not CatGender.Fluid,
+            _ => false
+        };
+    }
+
+    private static bool IsGayAttractedTo(CatGender ownGender, CatGender targetGender)
+    {
+        return ownGender switch
+        {
+            CatGender.Male => targetGender is CatGender.Male or CatGender.Fluid,
+            CatGender.Female => targetGender is CatGender.Female or CatGender.Fluid,
+            CatGender.Fluid => targetGender is CatGender.Fluid,
+            _ => false
+        };
+    }
+
+    private static int CountBits(int mask)
+    {
+        var count = 0;
+        var value = mask;
+        while (value != 0)
+        {
+            count += value & 1;
+            value >>= 1;
+        }
+
+        return count;
     }
 }
 
@@ -184,4 +315,15 @@ public sealed record BreedingPlanResult(
     IReadOnlyList<CatProfile> TopCats,
     IReadOnlyList<CatProfile> AdditionalDiversityCats,
     IReadOnlyList<GeneralPopulationEntry> GeneralPopulation,
-    int CoveredMask);
+    int CoveredMask,
+    IReadOnlyList<TopBreederRecommendation>? TopBreederRecommendations = null);
+
+public sealed record TopBreederRecommendation(
+    CatProfile Breeder,
+    IReadOnlyList<PartnerRecommendation> Partners);
+
+public sealed record PartnerRecommendation(
+    CatProfile Partner,
+    double Score,
+    int NovelPoolMask,
+    int NovelForBreederMask);

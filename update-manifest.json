@@ -1,10 +1,10 @@
 {
-  "version": "0.0.4",
-  "releaseNotes": "v0.0.4 | Hotfix",
+  "version": "0.0.5",
+  "releaseNotes": "v0.0.5 | Hotfix",
   "downloads": {
-    "win-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.4/Meowdex.Desktop-win-x64-Release.zip",
-    "linux-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.4/Meowdex.Desktop-linux-x64-Release.zip",
-    "osx-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.4/Meowdex.Desktop-osx-x64-Release.zip",
-    "osx-arm64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.4/Meowdex.Desktop-osx-arm64-Release.zip"
+    "win-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.5/Meowdex.Desktop-win-x64-Release.zip",
+    "linux-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.5/Meowdex.Desktop-linux-x64-Release.zip",
+    "osx-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.5/Meowdex.Desktop-osx-x64-Release.zip",
+    "osx-arm64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.0.5/Meowdex.Desktop-osx-arm64-Release.zip"
   }
 }

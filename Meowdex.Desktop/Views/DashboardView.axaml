@@ -129,13 +129,15 @@
         <StackPanel Spacing="10"
                     IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}">
           <TextBlock Text="Breeding Pool Roster" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock TextWrapping="Wrap"
+                     Text="How this works: Meowdex first picks your top breeders by natural-7 strength, compatibility, and base average. It then recommends partner cats for each top breeder based on breeding compatibility plus how much new natural-7 coverage they can add to the current pool and to that breeder's mask. The table below shows the combined breeding pool (top breeders + recommended partners)." />
           <TextBlock Classes="muted"
                      FontSize="11"
                      Text="{Binding TopCatCount, StringFormat=Top breeders: {0}}"
                      />
           <TextBlock Classes="muted"
                      FontSize="11"
-                     Text="{Binding BackfillsPerMask, StringFormat=Backfill partners per mask: {0}}"
+                     Text="{Binding BackfillsPerMask, StringFormat=Desired partners per top breeder: {0}}"
                      />
           <DataGrid x:Name="BreedingPoolGrid"
                     ItemsSource="{Binding Plan.BreedingPool}"
@@ -196,6 +198,50 @@
               <DataGridTextColumn Header="LCK" Binding="{Binding LukMark}" Width="56" SortMemberPath="LukSortKey" />
             </DataGrid.Columns>
           </DataGrid>
+
+          <Border Classes="overlay-panel" Padding="12">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Top Breeder Partners" FontSize="16" FontWeight="SemiBold" />
+              <TextBlock Classes="muted"
+                         FontSize="11"
+                         Text="{Binding BackfillsPerMask, StringFormat=Partners per top breeder: {0}}" />
+
+              <ItemsControl ItemsSource="{Binding Plan.TopBreederRecommendations}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border BorderBrush="{StaticResource BorderColor}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="10"
+                            Margin="0,0,0,8">
+                      <StackPanel Spacing="8">
+                        <TextBlock FontWeight="SemiBold"
+                                   Text="{Binding Breeder.Name, StringFormat=Breeder: {0}}" />
+                        <TextBlock Classes="muted"
+                                   FontSize="11"
+                                   Text="{Binding Breeder.Id, StringFormat=ID: #{0}}" />
+
+                        <DataGrid ItemsSource="{Binding Partners}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  HeadersVisibility="Column"
+                                  CanUserSortColumns="False"
+                                  MinHeight="80">
+                          <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Partner.Id}" Width="64" />
+                            <DataGridTextColumn Header="Partner" Binding="{Binding Partner.Name}" Width="180" />
+                            <DataGridTextColumn Header="Score" Binding="{Binding Score, StringFormat={}{0:F2}}" Width="80" />
+                            <DataGridTextColumn Header="Novel (Pool)" Binding="{Binding NovelPoolMask, Converter={StaticResource MaskConverter}}" Width="130" />
+                            <DataGridTextColumn Header="Novel (Breeder)" Binding="{Binding NovelForBreederMask, Converter={StaticResource MaskConverter}}" Width="140" />
+                          </DataGrid.Columns>
+                        </DataGrid>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
         </StackPanel>
 
         <StackPanel Spacing="10"

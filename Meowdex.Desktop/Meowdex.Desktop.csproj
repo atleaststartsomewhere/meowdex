@@ -6,7 +6,7 @@
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <ApplicationTitle>Meowdex</ApplicationTitle>
     <Product>Meowdex</Product>
-    <VersionPrefix>0.0.4</VersionPrefix>
+    <VersionPrefix>0.0.5</VersionPrefix>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
