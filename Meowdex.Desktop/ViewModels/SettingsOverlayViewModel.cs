@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Text;
+using Meowdex.Desktop.Services;
 
 namespace Meowdex.Desktop.ViewModels;
 
@@ -9,6 +11,9 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
     private string _importInput = string.Empty;
     private ImportSummaryData? _importSummary;
     private int _selectedProfile;
+    private string _updateStatus = "No update check yet.";
+    private string _updateNotes = string.Empty;
+    private string? _updateDownloadUrl;
 
     public SettingsOverlayViewModel(DashboardConfig current, int activeProfile, TaskCompletionSource<SettingsResult?> tcs)
     {
@@ -25,6 +30,9 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
         CloseCommand = new RelayCommand(Cancel);
         SetSectionCommand = new RelayCommand(param => SetSection(param?.ToString()));
         RunImportCommand = new AsyncRelayCommand(RunImportAsync, () => !string.IsNullOrWhiteSpace(ImportInput));
+        CheckUpdatesCommand = new AsyncRelayCommand(CheckForUpdatesAsync);
+        OpenUpdateDownloadCommand = new RelayCommand(_ => OpenUpdateDownload(), _ => !string.IsNullOrWhiteSpace(UpdateDownloadUrl));
+        InitializeUpdateStatusFromCache();
     }
 
     public ConfigDialogModel Config { get; }
@@ -32,6 +40,8 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
     public RelayCommand CloseCommand { get; }
     public RelayCommand SetSectionCommand { get; }
     public AsyncRelayCommand RunImportCommand { get; }
+    public AsyncRelayCommand CheckUpdatesCommand { get; }
+    public RelayCommand OpenUpdateDownloadCommand { get; }
     public IReadOnlyList<int> ProfileOptions { get; } = [1, 2, 3];
 
     public SettingsSection ActiveSection
@@ -56,6 +66,30 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
     {
         get => _importSummary;
         private set => SetProperty(ref _importSummary, value);
+    }
+
+    public string UpdateStatus
+    {
+        get => _updateStatus;
+        private set => SetProperty(ref _updateStatus, value);
+    }
+
+    public string UpdateNotes
+    {
+        get => _updateNotes;
+        private set => SetProperty(ref _updateNotes, value);
+    }
+
+    public string? UpdateDownloadUrl
+    {
+        get => _updateDownloadUrl;
+        private set
+        {
+            if (SetProperty(ref _updateDownloadUrl, value))
+            {
+                OpenUpdateDownloadCommand.RaiseCanExecuteChanged();
+            }
+        }
     }
 
     public int SelectedProfile
@@ -117,6 +151,65 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
         if (Enum.TryParse<SettingsSection>(value, out var section))
         {
             ActiveSection = section;
+        }
+    }
+
+    private void InitializeUpdateStatusFromCache()
+    {
+        var cached = AppServices.Updater.LastResult;
+        if (cached is null)
+        {
+            return;
+        }
+
+        ApplyUpdateResult(cached);
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        UpdateStatus = "Checking for updates...";
+        UpdateNotes = string.Empty;
+        UpdateDownloadUrl = null;
+
+        var result = await AppServices.Updater.CheckForUpdatesAsync();
+        ApplyUpdateResult(result);
+    }
+
+    private void ApplyUpdateResult(UpdateCheckResult result)
+    {
+        if (!string.IsNullOrWhiteSpace(result.Message) && !result.IsUpdateAvailable)
+        {
+            UpdateStatus = result.Message;
+            UpdateNotes = string.Empty;
+            UpdateDownloadUrl = null;
+            return;
+        }
+
+        if (!result.IsUpdateAvailable)
+        {
+            UpdateStatus = $"You're up to date ({result.CurrentVersion}).";
+            UpdateNotes = string.Empty;
+            UpdateDownloadUrl = null;
+            return;
+        }
+
+        var builder = new StringBuilder();
+        builder.Append($"Update available: {result.CurrentVersion} -> {result.LatestVersion}");
+        if (string.IsNullOrWhiteSpace(result.DownloadUrl))
+        {
+            builder.Append(" (no download URL for this platform)");
+        }
+
+        UpdateStatus = builder.ToString();
+        UpdateNotes = string.IsNullOrWhiteSpace(result.ReleaseNotes) ? string.Empty : result.ReleaseNotes;
+        UpdateDownloadUrl = result.DownloadUrl;
+    }
+
+    private void OpenUpdateDownload()
+    {
+        if (!AppServices.Updater.OpenDownloadUrl(UpdateDownloadUrl))
+        {
+            UpdateStatus = "Unable to open update download URL.";
         }
     }
 
@@ -242,7 +335,8 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
     public enum SettingsSection
     {
         Configuration,
-        ImportData
+        ImportData,
+        Updates
     }
 
     public sealed class ImportSummaryData

@@ -27,6 +27,7 @@ public sealed class App : Application
             AppServices.MainWindow = mainWindow;
             AppServices.OverlayHost = mainViewModel.OverlayHost;
             desktop.MainWindow = mainWindow;
+            _ = AppServices.WarmupUpdateStatusAsync();
         }
 
         base.OnFrameworkInitializationCompleted();

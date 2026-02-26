@@ -34,6 +34,10 @@
                         IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=ImportData, Mode=OneWay}"
                         Command="{Binding SetSectionCommand}"
                         CommandParameter="ImportData">Import Data</ToggleButton>
+          <ToggleButton Classes="settings-tab"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Updates, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="Updates">Updates</ToggleButton>
         </StackPanel>
 
         <Grid Grid.Row="1" Grid.Column="1">
@@ -84,6 +88,20 @@
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
+            </StackPanel>
+          </StackPanel>
+
+          <StackPanel Spacing="10"
+                      IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Updates}">
+            <TextBlock Text="Updates" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding UpdateStatus}" TextWrapping="Wrap" />
+            <TextBlock Classes="muted" TextWrapping="Wrap" Text="{Binding UpdateNotes}" />
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+              <Button Content="Check for Updates"
+                      Classes="primary"
+                      Command="{Binding CheckUpdatesCommand}" />
+              <Button Content="Open Download"
+                      Command="{Binding OpenUpdateDownloadCommand}" />
             </StackPanel>
           </StackPanel>
         </Grid>

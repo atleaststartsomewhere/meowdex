@@ -9,11 +9,16 @@ namespace Meowdex.Desktop;
 public static class AppServices
 {
     private static readonly SemaphoreSlim OverlayGate = new(1, 1);
+    private static readonly HttpClient UpdateHttpClient = new()
+    {
+        Timeout = TimeSpan.FromSeconds(6)
+    };
     private static readonly PlayerProfileStore ProfileStore = new();
     private static PlayerProfileState _profileState;
 
     public static CatRosterService Roster { get; } = new();
     public static BreedingAdvisorService Advisor { get; } = new();
+    public static AppUpdateService Updater { get; } = new(UpdateHttpClient, UpdateConfig.ManifestUrl);
     public static Window? MainWindow { get; set; }
     public static OverlayHostViewModel OverlayHost { get; set; } = new();
     public static int ActiveProfile { get; private set; }
@@ -25,6 +30,18 @@ public static class AppServices
         ActiveProfile = NormalizeProfile(_profileState.ActiveProfile);
         SettingsConfig = _profileState.GetConfig(ActiveProfile);
         Roster.SetActiveProfile(ActiveProfile);
+    }
+
+    public static async Task WarmupUpdateStatusAsync()
+    {
+        try
+        {
+            await Updater.CheckForUpdatesAsync();
+        }
+        catch
+        {
+            // Background check is best-effort.
+        }
     }
 
     public static async Task<bool> ConfirmAsync(string message)
