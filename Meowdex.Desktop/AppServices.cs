@@ -74,11 +74,7 @@ public static class AppServices
         SettingsConfig = _profileState.GetConfig(normalizedProfile);
         Roster.SetActiveProfile(normalizedProfile);
 
-        if (MainWindow?.DataContext is MainViewModel main)
-        {
-            await main.Dashboard.RefreshAsync();
-            await main.ManageCats.RefreshAsync();
-        }
+        await RefreshMainViewsAsync();
     }
 
     public static void ApplySettings(SettingsResult result)
@@ -101,6 +97,17 @@ public static class AppServices
     public static async Task<EditCatResult?> ShowEditCatAsync(CatProfile cat)
     {
         return await ShowOverlayAsync<EditCatResult?>(tcs => new EditCatOverlayViewModel(cat, tcs));
+    }
+
+    public static async Task RefreshMainViewsAsync()
+    {
+        if (MainWindow?.DataContext is not MainViewModel main)
+        {
+            return;
+        }
+
+        await main.Dashboard.RefreshAsync();
+        await main.ManageCats.RefreshAsync();
     }
 
     private static async Task<T> ShowOverlayAsync<T>(Func<TaskCompletionSource<T>, OverlayViewModelBase> createOverlay)

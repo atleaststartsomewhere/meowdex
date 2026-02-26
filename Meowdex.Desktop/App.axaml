@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:views="clr-namespace:Meowdex.Desktop.Views"
              xmlns:viewModels="clr-namespace:Meowdex.Desktop.ViewModels"
-             x:Class="Meowdex.Desktop.App">
+             x:Class="Meowdex.Desktop.App"
+             RequestedThemeVariant="Dark">
   <Application.Styles>
     <FluentTheme />
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />

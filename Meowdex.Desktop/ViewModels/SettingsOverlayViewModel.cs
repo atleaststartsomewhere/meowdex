@@ -253,6 +253,7 @@ public sealed class SettingsOverlayViewModel : OverlayViewModelBase
         var imported = await AppServices.Roster.AddCatsAsync(unique);
         summary.Imported = imported.Count;
         ImportSummary = summary;
+        await AppServices.RefreshMainViewsAsync();
     }
 
     private static bool TryParseLine(string line, int lineNumber, out Meowdex.Core.Models.CatProfile? cat, out string? error)

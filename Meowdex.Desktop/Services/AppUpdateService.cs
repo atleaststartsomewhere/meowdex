@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -49,7 +50,15 @@ public sealed class AppUpdateService
 
         try
         {
-            using var response = await _httpClient.GetAsync(_manifestUrl, ct);
+            using var request = new HttpRequestMessage(HttpMethod.Get, BuildNoCacheManifestUri(_manifestUrl));
+            request.Headers.CacheControl = new CacheControlHeaderValue
+            {
+                NoCache = true,
+                NoStore = true
+            };
+            request.Headers.Pragma.ParseAdd("no-cache");
+
+            using var response = await _httpClient.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode)
             {
                 return CacheResult(new UpdateCheckResult(
@@ -191,6 +200,12 @@ public sealed class AppUpdateService
 
         var core = version.Split('+', 2)[0].Trim();
         return Version.TryParse(core, out var parsed) ? parsed : null;
+    }
+
+    private static string BuildNoCacheManifestUri(string baseUrl)
+    {
+        var separator = baseUrl.Contains('?') ? "&" : "?";
+        return $"{baseUrl}{separator}cb={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
     }
 }
 

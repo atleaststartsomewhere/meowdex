@@ -138,6 +138,10 @@
     <Setter Property="FontWeight" Value="SemiBold" />
   </Style>
 
+  <Style Selector="Border.badge TextBlock.badge-label">
+    <Setter Property="Foreground" Value="#1F2328" />
+  </Style>
+
   <Style Selector="Border.badge.gender-male">
     <Setter Property="Background" Value="#e2f4ff" />
   </Style>

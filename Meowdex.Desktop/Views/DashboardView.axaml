@@ -104,16 +104,12 @@
                     IsReadOnly="True"
                     Height="240">
             <DataGrid.Columns>
+              <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="64" />
               <DataGridTextColumn Header="Stat Priority" Binding="{Binding Choice}" Width="140" />
               <DataGridTemplateColumn Header="Name" Width="*">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                      <TextBlock Text="{Binding Cat.Name}" />
-                      <TextBlock Classes="muted"
-                                 FontSize="11"
-                                 Text="{Binding Cat.Id, StringFormat=(#{0})}" />
-                    </StackPanel>
+                    <TextBlock Text="{Binding Cat.Name}" />
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
@@ -147,16 +143,12 @@
                     IsReadOnly="True"
                     Sorting="OnBreedingPoolSorting">
             <DataGrid.Columns>
+              <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="64" SortMemberPath="Id" />
               <DataGridTemplateColumn Header="Name" Width="260" SortMemberPath="NameWithId">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Grid ColumnDefinitions="*,Auto">
-                      <StackPanel Orientation="Horizontal" Spacing="4">
-                        <TextBlock Text="{Binding Cat.Name}" />
-                        <TextBlock Classes="muted"
-                                   FontSize="11"
-                                   Text="{Binding Cat.Id, StringFormat=(#{0})}" />
-                      </StackPanel>
+                      <TextBlock Text="{Binding Cat.Name}" />
                       <TextBlock Grid.Column="1"
                                  Margin="8,0,0,0"
                                  HorizontalAlignment="Right"
@@ -214,16 +206,12 @@
                     AutoGenerateColumns="False"
                     IsReadOnly="True">
             <DataGrid.Columns>
+              <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="64" SortMemberPath="Cat.Id" />
               <DataGridTemplateColumn Header="Name" Width="260" SortMemberPath="Cat.Name">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Grid ColumnDefinitions="*,Auto">
-                      <StackPanel Orientation="Horizontal" Spacing="4">
-                        <TextBlock Text="{Binding Cat.Name}" />
-                        <TextBlock Classes="muted"
-                                   FontSize="11"
-                                   Text="{Binding Cat.Id, StringFormat=(#{0})}" />
-                      </StackPanel>
+                      <TextBlock Text="{Binding Cat.Name}" />
                       <TextBlock Grid.Column="1"
                                  Margin="8,0,0,0"
                                  HorizontalAlignment="Right"
@@ -291,16 +279,12 @@
                     HeadersVisibility="Column"
                     HorizontalScrollBarVisibility="Auto">
             <DataGrid.Columns>
+              <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="64" SortMemberPath="Id" />
               <DataGridTemplateColumn Header="Name" Width="260" SortMemberPath="Name">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <Grid ColumnDefinitions="*,Auto">
-                      <StackPanel Orientation="Horizontal" Spacing="4">
-                        <TextBlock Text="{Binding Name}" />
-                        <TextBlock Classes="muted"
-                                   FontSize="11"
-                                   Text="{Binding Id, StringFormat=(#{0})}" />
-                      </StackPanel>
+                      <TextBlock Text="{Binding Name}" />
                       <TextBlock Grid.Column="1"
                                  Margin="8,0,0,0"
                                  HorizontalAlignment="Right"

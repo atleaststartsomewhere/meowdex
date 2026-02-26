@@ -27,6 +27,7 @@
               IsReadOnly="True"
               HorizontalScrollBarVisibility="Auto">
       <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="64" SortMemberPath="Id" />
         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="140" SortMemberPath="Name" />
         <DataGridTemplateColumn Header="R" Width="80" SortMemberPath="IsRetired">
           <DataGridTemplateColumn.CellTemplate>

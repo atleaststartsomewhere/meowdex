@@ -192,6 +192,7 @@ public sealed class DashboardViewModel : ViewModelBase
     {
         Func<BreedingPoolEntry, object?> keySelector = sortPath switch
         {
+            "Id" => entry => entry.Cat.Id,
             "NameWithId" => entry => entry.Cat.Name,
             "GenderSortKey" => entry => entry.GenderSortKey,
             "SexualitySortKey" => entry => entry.SexualitySortKey,
