@@ -11,6 +11,7 @@ public sealed class CatRosterService
     };
 
     private readonly SemaphoreSlim _mutex = new(1, 1);
+    private readonly Dictionary<int, List<CatProfile>> _debugSessionCats = [];
     private int _activeProfile = 1;
 
     public int ActiveProfile => _activeProfile;
@@ -142,21 +143,33 @@ public sealed class CatRosterService
 
     private async Task<IReadOnlyList<CatProfile>> LoadUnsafeAsync()
     {
-        var storePath = ResolveStorePath(_activeProfile);
-        EnsureLegacyProfileOneMigration(_activeProfile, storePath);
-        if (!File.Exists(storePath))
+        var profileId = NormalizeProfile(_activeProfile);
+        if (IsDebugSession())
         {
-            return [];
+            if (_debugSessionCats.TryGetValue(profileId, out var cached))
+            {
+                return CloneList(cached);
+            }
+
+            var seeded = await LoadPersistentUnsafeAsync(profileId, migrateLegacy: false, fallbackLegacyForProfileOne: true);
+            _debugSessionCats[profileId] = CloneList(seeded);
+            return CloneList(seeded);
         }
 
-        await using var stream = File.OpenRead(storePath);
-        var cats = await JsonSerializer.DeserializeAsync<List<CatProfile>>(stream, JsonOptions);
-        return cats ?? [];
+        return await LoadPersistentUnsafeAsync(profileId, migrateLegacy: true, fallbackLegacyForProfileOne: false);
     }
 
     private async Task SaveUnsafeAsync(IReadOnlyList<CatProfile> cats)
     {
-        var storePath = ResolveStorePath(_activeProfile);
+        var profileId = NormalizeProfile(_activeProfile);
+        if (IsDebugSession())
+        {
+            // In debug mode, never persist to disk; keep all changes in-memory for this process only.
+            _debugSessionCats[profileId] = CloneList(cats);
+            return;
+        }
+
+        var storePath = ResolveStorePath(profileId);
         var folder = Path.GetDirectoryName(storePath);
         if (!string.IsNullOrWhiteSpace(folder))
         {
@@ -167,10 +180,40 @@ public sealed class CatRosterService
         await JsonSerializer.SerializeAsync(stream, cats, JsonOptions);
     }
 
+    private static async Task<IReadOnlyList<CatProfile>> LoadPersistentUnsafeAsync(int profileId, bool migrateLegacy, bool fallbackLegacyForProfileOne)
+    {
+        var storePath = ResolveStorePath(profileId);
+        if (migrateLegacy)
+        {
+            EnsureLegacyProfileOneMigration(profileId, storePath);
+        }
+
+        if (File.Exists(storePath))
+        {
+            await using var stream = File.OpenRead(storePath);
+            var loaded = await JsonSerializer.DeserializeAsync<List<CatProfile>>(stream, JsonOptions);
+            return loaded ?? [];
+        }
+
+        if (fallbackLegacyForProfileOne && NormalizeProfile(profileId) == 1)
+        {
+            var legacyPath = ResolveLegacyStorePath();
+            if (File.Exists(legacyPath))
+            {
+                await using var legacyStream = File.OpenRead(legacyPath);
+                var legacyLoaded = await JsonSerializer.DeserializeAsync<List<CatProfile>>(legacyStream, JsonOptions);
+                return legacyLoaded ?? [];
+            }
+        }
+
+        return [];
+    }
+
     private static string ResolveStorePath(int profileId)
     {
-        var root = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var folder = Path.Combine(root, "Meowdex", $"Profile{NormalizeProfile(profileId)}");
+        var normalizedProfile = NormalizeProfile(profileId);
+        var appDataRoot = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var folder = Path.Combine(appDataRoot, "Meowdex", $"Profile{normalizedProfile}");
         return Path.Combine(folder, "cats.json");
     }
 
@@ -183,8 +226,7 @@ public sealed class CatRosterService
             return;
         }
 
-        var root = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var legacyPath = Path.Combine(root, "Meowdex", "cats.json");
+        var legacyPath = ResolveLegacyStorePath();
         if (!File.Exists(legacyPath))
         {
             return;
@@ -197,6 +239,26 @@ public sealed class CatRosterService
         }
 
         File.Copy(legacyPath, targetStorePath, overwrite: false);
+    }
+
+    private static string ResolveLegacyStorePath()
+    {
+        var root = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        return Path.Combine(root, "Meowdex", "cats.json");
+    }
+
+    private static bool IsDebugSession()
+    {
+#if DEBUG
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    private static List<CatProfile> CloneList(IEnumerable<CatProfile> cats)
+    {
+        return cats.Select(cat => cat.Clone()).ToList();
     }
 
     private static CatProfile Sanitize(CatProfile cat)

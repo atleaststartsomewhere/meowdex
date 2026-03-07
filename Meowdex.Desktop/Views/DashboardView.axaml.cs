@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using System.ComponentModel;
@@ -65,6 +66,58 @@ public sealed partial class DashboardView : UserControl
         }
     }
 
+    private void OnGoHome(object? sender, PointerPressedEventArgs e)
+    {
+        if (DataContext is not DashboardViewModel vm)
+        {
+            return;
+        }
+
+        vm.SetSectionCommand.Execute("Snapshot");
+        TeamMenuPopup.IsOpen = false;
+    }
+
+    private void OnTeamMenuToggle(object? sender, RoutedEventArgs e)
+    {
+        TeamMenuPopup.IsOpen = !TeamMenuPopup.IsOpen;
+    }
+
+    private void OnClearTeam(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not DashboardViewModel vm)
+        {
+            return;
+        }
+
+        vm.ClearCurrentTeam();
+        TeamMenuPopup.IsOpen = false;
+    }
+
+    private async void OnRetireTeam(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not DashboardViewModel vm)
+        {
+            return;
+        }
+
+        var activeTeamCount = vm.AdventuringTeam.Count(slot => slot.Cat is not null && !slot.Cat.IsRetired);
+        if (activeTeamCount == 0)
+        {
+            TeamMenuPopup.IsOpen = false;
+            return;
+        }
+
+        var confirmed = await AppServices.ConfirmAsync("Retire all currently selected adventuring team cats?");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        await vm.RetireCurrentTeamAsync();
+        TeamMenuPopup.IsOpen = false;
+        StabilizeFullRosterGridLayout();
+    }
+
     private async void OnAddCat(object? sender, RoutedEventArgs e)
     {
         try
@@ -88,6 +141,39 @@ public sealed partial class DashboardView : UserControl
         {
             Trace.WriteLine($"DashboardView add cat workflow failed: {ex}");
         }
+    }
+
+    private void OnRemoveFromBreedingPool(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not DashboardViewModel vm || sender is not Button button || button.Tag is not int catId)
+        {
+            return;
+        }
+
+        vm.RemoveFromBreedingPool(catId);
+        e.Handled = true;
+    }
+
+    private void OnSendToBreedingPool(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not DashboardViewModel vm || sender is not Button button || button.Tag is not int catId)
+        {
+            return;
+        }
+
+        vm.SendToBreedingPool(catId);
+        e.Handled = true;
+    }
+
+    private void OnSendToTeam(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not DashboardViewModel vm || sender is not Button button || button.Tag is not int catId)
+        {
+            return;
+        }
+
+        vm.SendToAdventuringTeam(catId);
+        e.Handled = true;
     }
 
     private void OnBreedingPoolSorting(object? sender, DataGridColumnEventArgs e)
@@ -119,6 +205,14 @@ public sealed partial class DashboardView : UserControl
     private async void OnGridRowPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (_openingEdit || DataContext is not DashboardViewModel vm || e.Source is not Control source)
+        {
+            return;
+        }
+
+        if (source.FindAncestorOfType<Button>() is not null ||
+            source.FindAncestorOfType<ToggleButton>() is not null ||
+            source.FindAncestorOfType<Expander>() is not null ||
+            source.FindAncestorOfType<ComboBox>() is not null)
         {
             return;
         }

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="7 12 50 40" aria-hidden="true">
+  <g transform="translate(0 -1)">
+    <g fill="#2a2a2a">
+      <circle cx="32" cy="27" r="8"/>
+      <polygon points="26,22 28.5,16 31,22"/>
+      <polygon points="33,22 35.5,16 38,22"/>
+    </g>
+
+    <g fill="#1b1b1b">
+      <circle cx="18" cy="33" r="9"/>
+      <polygon points="12,26 15,19 18,26" transform="translate(0,1)"/>
+      <polygon points="19,26 22,19 25,26" transform="translate(0,1)"/>
+    </g>
+
+    <g fill="#1b1b1b">
+      <circle cx="46" cy="33" r="9"/>
+      <polygon points="40,26 43,19 46,26" transform="translate(0,1)"/>
+      <polygon points="47,26 50,19 53,26" transform="translate(0,1)"/>
+    </g>
+
+    <g fill="#080808">
+      <circle cx="32" cy="38" r="12"/>
+      <polygon points="24,30 28,18 32,30"/>
+      <polygon points="32,30 36,18 40,30"/>
+    </g>
+
+    <g fill="#aaa">
+      <rect x="22" y="30" width="20" height="4" rx="2"/>
+    </g>
+
+    <g fill="white">
+      <circle cx="28.5" cy="38" r="1.5"/>
+      <circle cx="35.5" cy="38" r="1.5"/>
+      <circle cx="32" cy="41" r="1.2"/>
+    </g>
+  </g>
+</svg>

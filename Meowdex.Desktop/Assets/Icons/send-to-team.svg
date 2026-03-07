@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+  <g fill="white">
+
+    <!-- box body -->
+    <rect x="6" y="11" width="12" height="8" rx="1"/>
+
+    <!-- top rim -->
+    <rect x="6" y="10" width="12" height="2"/>
+
+  </g>
+
+  <g stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- left open flap (angled slightly downward) -->
+    <path d="M6 10 L3 11.5"/>
+
+    <!-- right open flap (angled slightly downward) -->
+    <path d="M18 10 L21 11.5"/>
+
+  </g>
+</svg>

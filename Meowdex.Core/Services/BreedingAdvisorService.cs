@@ -75,6 +75,7 @@ public sealed class BreedingAdvisorService
             .OrderByDescending(cat => cat.CurrentAverage)
             .Select(cat => new GeneralPopulationEntry(
                 cat,
+                compatibleCounts[cat.Id],
                 cat.IsRetired
                     ? "Retired"
                     : cat.HasNaturalSeven ? "Outside selected breeding set" : "No natural base 7"))
@@ -258,6 +259,8 @@ public sealed record BreedingPoolEntry(
 {
     public string NameWithId => Cat.Name;
     public int Id => Cat.Id;
+    public string CurrentBaseSummary =>
+        string.Create(CultureInfo.InvariantCulture, $"{Cat.CurrentAverage:F2} / {Cat.BaseAverage:F2}");
     public string GenderSortKey => Cat.Gender.ToString();
     public string SexualitySortKey => Cat.Sexuality switch
     {
@@ -306,7 +309,58 @@ public sealed record BreedingPoolEntry(
 
 public sealed record GeneralPopulationEntry(
     CatProfile Cat,
-    string Reason);
+    int CompatiblePartners,
+    string Reason)
+{
+    public string NameWithId => Cat.Name;
+    public int Id => Cat.Id;
+    public string CurrentBaseSummary =>
+        string.Create(CultureInfo.InvariantCulture, $"{Cat.CurrentAverage:F2} / {Cat.BaseAverage:F2}");
+    public string GenderSortKey => Cat.Gender.ToString();
+    public string SexualitySortKey => Cat.Sexuality switch
+    {
+        CatSexuality.Bi => "Bisexual",
+        CatSexuality.GayLesbian => "Gay / Lesbian",
+        CatSexuality.Straight => "Straight",
+        _ => string.Empty
+    };
+
+    public bool Str => HasBit(Cat.SevenMask, 0);
+    public bool Dex => HasBit(Cat.SevenMask, 1);
+    public bool Sta => HasBit(Cat.SevenMask, 2);
+    public bool Int => HasBit(Cat.SevenMask, 3);
+    public bool Spd => HasBit(Cat.SevenMask, 4);
+    public bool Cha => HasBit(Cat.SevenMask, 5);
+    public bool Luk => HasBit(Cat.SevenMask, 6);
+
+    public string StrMark => Str ? "✓" : string.Empty;
+    public string DexMark => Dex ? "✓" : string.Empty;
+    public string StaMark => Sta ? "✓" : string.Empty;
+    public string IntMark => Int ? "✓" : string.Empty;
+    public string SpdMark => Spd ? "✓" : string.Empty;
+    public string ChaMark => Cha ? "✓" : string.Empty;
+    public string LukMark => Luk ? "✓" : string.Empty;
+
+    public string StrSortKey => BuildBitSortKey(Str, Cat);
+    public string DexSortKey => BuildBitSortKey(Dex, Cat);
+    public string StaSortKey => BuildBitSortKey(Sta, Cat);
+    public string IntSortKey => BuildBitSortKey(Int, Cat);
+    public string SpdSortKey => BuildBitSortKey(Spd, Cat);
+    public string ChaSortKey => BuildBitSortKey(Cha, Cat);
+    public string LukSortKey => BuildBitSortKey(Luk, Cat);
+
+    private static bool HasBit(int mask, int bitIndex) => (mask & (1 << bitIndex)) != 0;
+
+    private static string BuildBitSortKey(bool hasBit, CatProfile cat)
+    {
+        var bitRank = hasBit ? 0 : 1;
+        var baseRank = 1000 - cat.BaseAverage;
+        var currentRank = 1000 - cat.CurrentAverage;
+        return string.Create(
+            CultureInfo.InvariantCulture,
+            $"{bitRank:D1}|{baseRank:0000.000}|{currentRank:0000.000}|{cat.Name}");
+    }
+}
 
 public sealed record BreedingPlanResult(
     int TopCatCount,

@@ -16,6 +16,7 @@
     <SolidColorBrush x:Key="AppBackground" Color="#2B2D31" />
     <SolidColorBrush x:Key="SurfaceBackground" Color="#313338" />
     <SolidColorBrush x:Key="SurfaceAltBackground" Color="#383A40" />
+    <SolidColorBrush x:Key="SurfaceRowAltBackground" Color="#3A3C42" />
     <SolidColorBrush x:Key="BorderColor" Color="#3F4147" />
     <SolidColorBrush x:Key="TextPrimary" Color="#E6E8EA" />
     <SolidColorBrush x:Key="TextMuted" Color="#B5BAC1" />
@@ -90,6 +91,14 @@
     <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
     <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
     <Setter Property="GridLinesVisibility" Value="Horizontal" />
+  </Style>
+
+  <Style Selector="DataGridRow">
+    <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
+  </Style>
+
+  <Style Selector="DataGridRow:nth-child(even)">
+    <Setter Property="Background" Value="{StaticResource SurfaceRowAltBackground}" />
   </Style>
 
   <Style Selector="DataGridColumnHeader">
@@ -178,6 +187,50 @@
     <Setter Property="Width" Value="18" />
     <Setter Property="Height" Value="18" />
     <Setter Property="Stretch" Value="Uniform" />
+  </Style>
+
+  <Style Selector="Image.menu-icon">
+    <Setter Property="Width" Value="58" />
+    <Setter Property="Height" Value="58" />
+    <Setter Property="Stretch" Value="Uniform" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="ToggleButton.tab-tracker, Button.nav-btn">
+    <Setter Property="MinHeight" Value="70" />
+    <Setter Property="Height" Value="70" />
+    <Setter Property="Padding" Value="2" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+    <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+  </Style>
+
+  <Style Selector="ToggleButton.nav-icon-btn, Button.nav-icon-btn">
+    <Setter Property="MinWidth" Value="70" />
+    <Setter Property="Width" Value="70" />
+  </Style>
+
+  <Style Selector="ToggleButton.nav-icon-btn Image.menu-icon, Button.nav-icon-btn Image.menu-icon">
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Margin" Value="0" />
+  </Style>
+
+  <Style Selector="Button.team-btn">
+    <Setter Property="MinWidth" Value="74" />
+    <Setter Property="Width" Value="74" />
+    <Setter Property="Height" Value="74" />
+    <Setter Property="Padding" Value="1,2" />
+  </Style>
+
+  <Style Selector="ToggleButton.tab-tracker:checked">
+    <Setter Property="Background" Value="{StaticResource SurfaceBackground}" />
+    <Setter Property="BorderBrush" Value="{StaticResource AccentStrong}" />
   </Style>
 
   <Style Selector="ToggleButton.settings-tab">
