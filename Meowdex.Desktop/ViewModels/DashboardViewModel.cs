@@ -15,9 +15,11 @@ public sealed class DashboardViewModel : ViewModelBase
     private int _backfillsPerMask = 1;
     private int _minMaskSevenCount;
     private bool _teamAutoEnabled = true;
+    private int _selectedTeamSlotIndex = -1;
     private readonly HashSet<int> _forcedAvailableCatIds = [];
     private readonly HashSet<int> _forcedBreedingCatIds = [];
-    private readonly List<int> _pinnedTeamCatIds = [];
+    private HashSet<int> _autoBreedingCatIds = [];
+    private readonly int?[] _pinnedTeamCatIdsByRow = new int?[4];
     private BreedingPlanResult _plan = new(3, 1, [], [], [], [], 0);
     private DashboardSection _activeSection = DashboardSection.Snapshot;
 
@@ -33,10 +35,12 @@ public sealed class DashboardViewModel : ViewModelBase
         };
         AdventuringTeam = new ObservableCollection<AdventuringSlot>();
         Cats = new ObservableCollection<CatProfile>();
+        FullRosterEntries = new ObservableCollection<GeneralPopulationEntry>();
         SetSectionCommand = new RelayCommand(param => SetSection(param?.ToString()));
     }
 
     public ObservableCollection<CatProfile> Cats { get; }
+    public ObservableCollection<GeneralPopulationEntry> FullRosterEntries { get; }
 
     public int TotalCats => Cats.Count;
     public int RetiredCount => Cats.Count(cat => cat.IsRetired);
@@ -134,6 +138,12 @@ public sealed class DashboardViewModel : ViewModelBase
         }
     }
 
+    public int SelectedTeamSlotIndex
+    {
+        get => _selectedTeamSlotIndex;
+        set => SetProperty(ref _selectedTeamSlotIndex, value);
+    }
+
     public ObservableCollection<RowPrioritySetting> RowPriorities { get; }
 
     public ObservableCollection<AdventuringSlot> AdventuringTeam { get; }
@@ -171,7 +181,26 @@ public sealed class DashboardViewModel : ViewModelBase
     public void ClearCurrentTeam()
     {
         TeamAutoEnabled = false;
-        _pinnedTeamCatIds.Clear();
+        ClearPinnedTeamSlots();
+        SelectedTeamSlotIndex = -1;
+        foreach (var row in RowPriorities)
+        {
+            row.Choice = RowStatChoice.None;
+        }
+
+        RebuildAdventuringTeam();
+    }
+
+    public void ResetTeamToFullAuto()
+    {
+        ClearPinnedTeamSlots();
+        SelectedTeamSlotIndex = -1;
+        if (!TeamAutoEnabled)
+        {
+            TeamAutoEnabled = true;
+            return;
+        }
+
         foreach (var row in RowPriorities)
         {
             row.Choice = RowStatChoice.None;
@@ -220,7 +249,9 @@ public sealed class DashboardViewModel : ViewModelBase
         BackfillsPerMask = Math.Max(0, BackfillsPerMask);
         MinMaskSevenCount = Math.Max(0, MinMaskSevenCount);
 
-        Plan = _advisor.BuildPlan(Cats, new BreedingPlanOptions(TopCatCount, BackfillsPerMask, MinMaskSevenCount));
+        var autoPlan = _advisor.BuildPlan(Cats, new BreedingPlanOptions(TopCatCount, BackfillsPerMask, MinMaskSevenCount));
+        _autoBreedingCatIds = autoPlan.BreedingPool.Select(entry => entry.Cat.Id).ToHashSet();
+        Plan = autoPlan;
         ApplyManualPoolOverrides();
         RebuildAdventuringTeam();
     }
@@ -271,26 +302,44 @@ public sealed class DashboardViewModel : ViewModelBase
         RebuildAdventuringTeam();
     }
 
-    public void SendToAdventuringTeam(int catId)
+    public SendToTeamResult SendToAdventuringTeam(int catId, int? preferredRow = null)
     {
         var candidate = Cats.FirstOrDefault(cat => cat.Id == catId);
         if (candidate is null || candidate.IsRetired)
         {
-            return;
+            return SendToTeamResult.InvalidCat;
         }
 
-        if (_pinnedTeamCatIds.Contains(catId))
+        var existingIndex = Array.IndexOf(_pinnedTeamCatIdsByRow, (int?)catId);
+        if (preferredRow is null && existingIndex >= 0)
         {
-            return;
+            return SendToTeamResult.AlreadyOnTeam;
         }
 
-        if (_pinnedTeamCatIds.Count >= 4)
+        for (var i = 0; i < _pinnedTeamCatIdsByRow.Length; i++)
         {
-            return;
+            if (_pinnedTeamCatIdsByRow[i] == catId)
+            {
+                _pinnedTeamCatIdsByRow[i] = null;
+            }
         }
 
-        _pinnedTeamCatIds.Add(catId);
+        if (preferredRow is >= 1 and <= 4)
+        {
+            _pinnedTeamCatIdsByRow[preferredRow.Value - 1] = catId;
+            RebuildAdventuringTeam();
+            return SendToTeamResult.ReplacedSelectedSlot;
+        }
+
+        var firstOpenSlot = Array.FindIndex(_pinnedTeamCatIdsByRow, id => id is null);
+        if (firstOpenSlot < 0)
+        {
+            return SendToTeamResult.TeamFullNeedsSlotSelection;
+        }
+
+        _pinnedTeamCatIdsByRow[firstOpenSlot] = catId;
         RebuildAdventuringTeam();
+        return SendToTeamResult.AddedToBottom;
     }
 
     private void RebuildAdventuringTeam()
@@ -302,12 +351,19 @@ public sealed class DashboardViewModel : ViewModelBase
             .Where(cat => !cat.IsRetired)
             .ToList();
 
-        _pinnedTeamCatIds.RemoveAll(id => Cats.All(cat => cat.Id != id || cat.IsRetired));
-        var pinnedCats = _pinnedTeamCatIds
-            .Select(id => Cats.FirstOrDefault(cat => cat.Id == id && !cat.IsRetired))
-            .Where(cat => cat is not null)
-            .Cast<CatProfile>()
-            .ToList();
+        for (var i = 0; i < _pinnedTeamCatIdsByRow.Length; i++)
+        {
+            var pinnedId = _pinnedTeamCatIdsByRow[i];
+            if (pinnedId is null)
+            {
+                continue;
+            }
+
+            if (Cats.All(cat => cat.Id != pinnedId.Value || cat.IsRetired))
+            {
+                _pinnedTeamCatIdsByRow[i] = null;
+            }
+        }
 
         var requests = RowPriorities
             .Select(row => new RowRequest(row.RowIndex, TeamAutoEnabled ? RowStatChoice.None : row.Choice))
@@ -318,9 +374,13 @@ public sealed class DashboardViewModel : ViewModelBase
         {
             var req = requests[i];
 
-            if (i < pinnedCats.Count)
+            var pinnedId = _pinnedTeamCatIdsByRow[i];
+            var pinned = pinnedId is null
+                ? null
+                : Cats.FirstOrDefault(cat => cat.Id == pinnedId.Value && !cat.IsRetired);
+
+            if (pinned is not null)
             {
-                var pinned = pinnedCats[i];
                 usedIds.Add(pinned.Id);
                 AdventuringTeam.Add(new AdventuringSlot(req.RowIndex, req.Choice, pinned, ScoreForChoice(pinned, req.Choice)));
                 continue;
@@ -359,6 +419,8 @@ public sealed class DashboardViewModel : ViewModelBase
                 ? slot.Cat.Name
                 : "No cat selected";
         }
+
+        ApplyTeamMembershipIndicators();
     }
 
     private void ApplyManualPoolOverrides()
@@ -418,6 +480,8 @@ public sealed class DashboardViewModel : ViewModelBase
             {
                 generalEntriesById[cat.Id] = new GeneralPopulationEntry(
                     cat,
+                    _autoBreedingCatIds.Contains(cat.Id),
+                    false,
                     GetCompatiblePartners(cat),
                     "Manually removed from breeding pool");
             }
@@ -432,6 +496,8 @@ public sealed class DashboardViewModel : ViewModelBase
                 cat,
                 BreedingAdvisorService.FormatMask(cat.SevenMask),
                 poolCompatibleCounts[cat.Id],
+                _autoBreedingCatIds.Contains(cat.Id),
+                false,
                 reasonsByPoolId.GetValueOrDefault(cat.Id, "Manually added to breeding pool")))
             .ToList();
 
@@ -461,6 +527,64 @@ public sealed class DashboardViewModel : ViewModelBase
         return Cats.Count(other => other.Id != cat.Id && BreedingAdvisorService.CanBreed(cat, other));
     }
 
+    private void RebuildFullRosterEntries()
+    {
+        var currentPoolIds = Plan.BreedingPool.Select(entry => entry.Cat.Id).ToHashSet();
+
+        var entries = Cats
+            .Select(cat => new GeneralPopulationEntry(
+                cat,
+                _autoBreedingCatIds.Contains(cat.Id),
+                false,
+                GetCompatiblePartners(cat),
+                cat.IsRetired ? "Retired" : "",
+                currentPoolIds.Contains(cat.Id)))
+            .OrderByDescending(entry => entry.Cat.CurrentAverage)
+            .ToList();
+
+        FullRosterEntries.Clear();
+        foreach (var entry in entries)
+        {
+            FullRosterEntries.Add(entry);
+        }
+    }
+
+    private void ApplyTeamMembershipIndicators()
+    {
+        var teamIds = AdventuringTeam
+            .Where(slot => slot.Cat is not null && !slot.Cat.IsRetired)
+            .Select(slot => slot.Cat!.Id)
+            .ToHashSet();
+        var currentPoolIds = Plan.BreedingPool.Select(entry => entry.Cat.Id).ToHashSet();
+
+        Plan = Plan with
+        {
+            BreedingPool = Plan.BreedingPool
+                .Select(entry => entry with { IsInAdventuringTeam = teamIds.Contains(entry.Cat.Id) })
+                .ToList(),
+            GeneralPopulation = Plan.GeneralPopulation
+                .Select(entry => entry with { IsInAdventuringTeam = teamIds.Contains(entry.Cat.Id) })
+                .ToList()
+        };
+
+        var entries = Cats
+            .Select(cat => new GeneralPopulationEntry(
+                cat,
+                _autoBreedingCatIds.Contains(cat.Id),
+                teamIds.Contains(cat.Id),
+                GetCompatiblePartners(cat),
+                cat.IsRetired ? "Retired" : "",
+                currentPoolIds.Contains(cat.Id)))
+            .OrderByDescending(entry => entry.Cat.CurrentAverage)
+            .ToList();
+
+        FullRosterEntries.Clear();
+        foreach (var entry in entries)
+        {
+            FullRosterEntries.Add(entry);
+        }
+    }
+
     private void OnRowPriorityChanged(RowPrioritySetting row)
     {
         if (TeamAutoEnabled && row.Choice != RowStatChoice.None)
@@ -470,6 +594,14 @@ public sealed class DashboardViewModel : ViewModelBase
         }
 
         RebuildAdventuringTeam();
+    }
+
+    private void ClearPinnedTeamSlots()
+    {
+        for (var i = 0; i < _pinnedTeamCatIdsByRow.Length; i++)
+        {
+            _pinnedTeamCatIdsByRow[i] = null;
+        }
     }
 
     private static string ToChoiceLabel(RowStatChoice choice)
@@ -584,6 +716,15 @@ public sealed class DashboardViewModel : ViewModelBase
         Breeding,
         Available,
         FullRoster
+    }
+
+    public enum SendToTeamResult
+    {
+        AddedToBottom,
+        ReplacedSelectedSlot,
+        TeamFullNeedsSlotSelection,
+        AlreadyOnTeam,
+        InvalidCat
     }
 
     private static int CountBits(int mask)

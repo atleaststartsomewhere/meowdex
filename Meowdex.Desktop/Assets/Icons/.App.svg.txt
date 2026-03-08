@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+  <!-- Top shell only -->
+  <g fill="#080808">
+    <rect x="10" y="14" width="44" height="34" rx="8"/>
+    <polygon points="18,18 24,4 30,18"/>
+    <polygon points="34,18 40,4 46,18"/>
+  </g>
+
+  <!-- Screen -->
+  <g fill="white">
+    <rect x="18" y="22" width="28" height="14" rx="3"/>
+  </g>
+
+  <!-- Cat face in screen -->
+  <g fill="#080808">
+    <circle cx="27" cy="28" r="1.6"/>
+    <circle cx="37" cy="28" r="1.6"/>
+    <circle cx="32" cy="32" r="1.2"/>
+  </g>
+
+  <!-- Bottom lip / hinge hint -->
+  <g fill="#121212">
+    <rect x="16" y="42" width="32" height="4" rx="2"/>
+  </g>
+</svg>

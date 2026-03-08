@@ -1,28 +1,49 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sections="clr-namespace:Meowdex.Desktop.Views.Sections"
              x:Class="Meowdex.Desktop.Views.DashboardView">
-  <Grid RowDefinitions="Auto,*">
+  <Grid RowDefinitions="Auto,Auto,*">
     <Border Grid.Row="0"
             Background="{StaticResource SurfaceBackground}"
             BorderBrush="{StaticResource BorderColor}"
             BorderThickness="0,0,0,1"
             Padding="12,2"
             ZIndex="10">
-      <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="74">
-        <TextBlock Grid.Column="0"
-                   Margin="0,0,14,0"
-                   VerticalAlignment="Center"
-                   Cursor="Hand"
-                   PointerPressed="OnGoHome"
-                   FontSize="20"
-                   FontWeight="SemiBold"
-                   Text="The Meowdex" />
+      <Grid ColumnDefinitions="Auto,*,Auto" MinHeight="74">
+        <StackPanel Grid.Column="0"
+                    Margin="0,0,14,0"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    VerticalAlignment="Center"
+                    Cursor="Hand"
+                    PointerPressed="OnGoHome">
+          <Image Width="24"
+                 Height="24"
+                 VerticalAlignment="Center"
+                 Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/.App.svg}" />
+          <StackPanel Spacing="1" VerticalAlignment="Center">
+            <TextBlock FontSize="20"
+                       FontWeight="SemiBold"
+                       Text="The Meowdex" />
+            <TextBlock Classes="muted"
+                       FontSize="11"
+                       Text="{Binding TotalCats, StringFormat={}{0} Feline Specimens}" />
+          </StackPanel>
+        </StackPanel>
 
         <StackPanel Grid.Column="1"
                     Orientation="Horizontal"
                     Spacing="6"
                     VerticalAlignment="Stretch"
-                    HorizontalAlignment="Center">
+                    HorizontalAlignment="Center"> 
+          <ToggleButton Classes="tab-tracker nav-icon-btn"
+                        IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring, Mode=OneWay}"
+                        Command="{Binding SetSectionCommand}"
+                        CommandParameter="Adventuring"
+                        ToolTip.Tip="Adventuring Team">
+            <Image Classes="menu-icon"
+                   Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/adventure-team.svg}" />
+          </ToggleButton>
           <ToggleButton Classes="tab-tracker nav-icon-btn"
                         IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding, Mode=OneWay}"
                         Command="{Binding SetSectionCommand}"
@@ -47,7 +68,7 @@
             <Image Classes="menu-icon"
                    Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/roster.svg}" />
           </ToggleButton>
-          <Button Classes="primary nav-btn nav-icon-btn"
+          <Button Classes="primary nav-btn nav-icon-btn add-cat-btn"
                   Click="OnAddCat"
                   ToolTip.Tip="Add Cat">
             <Image Classes="menu-icon"
@@ -55,535 +76,89 @@
           </Button>
         </StackPanel>
 
-        <Button x:Name="TeamMenuButton"
-                Grid.Column="2"
-                Margin="0,0,10,0"
-                Classes="ghost nav-btn nav-icon-btn team-btn"
-                Click="OnTeamMenuToggle">
-          <StackPanel Orientation="Vertical" Spacing="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Image Classes="menu-icon"
-                   Width="46"
-                   Height="46"
-                   Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/adventure-team.svg}" />
-            <TextBlock HorizontalAlignment="Center"
-                       FontSize="11"
-                       LineHeight="11"
-                       Text="{Binding AdventuringTeamCount}" />
-          </StackPanel>
-        </Button>
-
-        <Button Grid.Column="3"
+        <Button Grid.Column="2"
                 Classes="icon-btn"
                 Content="&#x2699;"
                 Click="OnSettings" />
-
-        <Popup x:Name="TeamMenuPopup"
-               Grid.Column="2"
-               PlacementTarget="{Binding #TeamMenuButton}"
-               PlacementMode="BottomEdgeAlignedRight"
-               HorizontalOffset="0"
-               VerticalOffset="6"
-               IsLightDismissEnabled="True">
-          <Border Background="{StaticResource SurfaceBackground}"
-                  BorderBrush="{StaticResource BorderColor}"
-                  BorderThickness="1"
-                  CornerRadius="10"
-                  Padding="12"
-                  Width="360"
-                  MaxHeight="420">
-            <Grid RowDefinitions="Auto,*,Auto">
-              <TextBlock Text="Current Adventuring Team"
-                         Margin="0,0,0,8"
-                         FontSize="15"
-                         FontWeight="SemiBold" />
-
-              <ScrollViewer Grid.Row="1" MaxHeight="260" Margin="0,0,0,8">
-                <ItemsControl ItemsSource="{Binding RowPriorities}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                      <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6">
-                        <TextBlock Text="{Binding AssignedCatName}" />
-                        <ComboBox Grid.Column="1"
-                                  Width="122"
-                                  Margin="10,0,0,0"
-                                  ItemsSource="{Binding DataContext.RowChoiceLabels, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                  SelectedItem="{Binding ChoiceLabel}" />
-                      </Grid>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </ScrollViewer>
-
-              <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-                <CheckBox Grid.Column="0"
-                          VerticalAlignment="Center"
-                          Content="Auto"
-                          IsChecked="{Binding TeamAutoEnabled}" />
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Spacing="8">
-                  <Button Content="Clear Team"
-                          Click="OnClearTeam" />
-                  <Button Classes="primary"
-                          Content="Retire Team"
-                          Click="OnRetireTeam" />
-                </StackPanel>
-              </Grid>
-            </Grid>
-          </Border>
-        </Popup>
       </Grid>
     </Border>
 
-    <ScrollViewer Grid.Row="1">
-    <StackPanel Spacing="16" Margin="24">
-      <StackPanel Spacing="16">
-        <StackPanel Spacing="8"
-                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot}">
-          <Grid ColumnDefinitions="*,*,*">
-            <Border Grid.Column="0" Classes="overlay-panel" Padding="12" Margin="0,0,8,0">
-              <StackPanel Spacing="6">
-                <TextBlock Text="Coverage" FontWeight="SemiBold" />
-                <TextBlock FontSize="20" FontWeight="Bold"
-                           Text="{Binding CoverageSummary}" />
-                <TextBlock Text="{Binding CoveragePercent, StringFormat={}{0:F0}% total mask coverage}" />
-                <TextBlock Text="{Binding MissingStatSummary}" TextWrapping="Wrap" />
-                <TextBlock Classes="muted"
-                           Text="{Binding Plan.CoveredMask, Converter={StaticResource MaskConverter}, StringFormat=Mask: {0}}" />
-              </StackPanel>
-            </Border>
+    <Border Grid.Row="1"
+            Background="{StaticResource AppBackground}"
+            BorderBrush="{StaticResource BorderColor}"
+            BorderThickness="0,0,0,1"
+            Padding="12,6">
+      <StackPanel Orientation="Horizontal"
+                  Spacing="8"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Center">
+        <ToggleButton MinWidth="84"
+                      Height="28"
+                      Padding="6,2"
+                      Tag="1"
+                      IsChecked="{Binding SelectedTeamSlotIndex, Converter={StaticResource EqualsConverter}, ConverterParameter=0, Mode=OneWay}"
+                      Click="OnTeamSlotToggle">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock FontSize="11" Classes="muted" Text="#1" />
+            <TextBlock Width="54" FontSize="11" TextTrimming="CharacterEllipsis" Text="{Binding RowPriorities[0].AssignedCatName}" />
+          </StackPanel>
+        </ToggleButton>
+        <ToggleButton MinWidth="84"
+                      Height="28"
+                      Padding="6,2"
+                      Tag="2"
+                      IsChecked="{Binding SelectedTeamSlotIndex, Converter={StaticResource EqualsConverter}, ConverterParameter=1, Mode=OneWay}"
+                      Click="OnTeamSlotToggle">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock FontSize="11" Classes="muted" Text="#2" />
+            <TextBlock Width="54" FontSize="11" TextTrimming="CharacterEllipsis" Text="{Binding RowPriorities[1].AssignedCatName}" />
+          </StackPanel>
+        </ToggleButton>
+        <ToggleButton MinWidth="84"
+                      Height="28"
+                      Padding="6,2"
+                      Tag="3"
+                      IsChecked="{Binding SelectedTeamSlotIndex, Converter={StaticResource EqualsConverter}, ConverterParameter=2, Mode=OneWay}"
+                      Click="OnTeamSlotToggle">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock FontSize="11" Classes="muted" Text="#3" />
+            <TextBlock Width="54" FontSize="11" TextTrimming="CharacterEllipsis" Text="{Binding RowPriorities[2].AssignedCatName}" />
+          </StackPanel>
+        </ToggleButton>
+        <ToggleButton MinWidth="84"
+                      Height="28"
+                      Padding="6,2"
+                      Tag="4"
+                      IsChecked="{Binding SelectedTeamSlotIndex, Converter={StaticResource EqualsConverter}, ConverterParameter=3, Mode=OneWay}"
+                      Click="OnTeamSlotToggle">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock FontSize="11" Classes="muted" Text="#4" />
+            <TextBlock Width="54" FontSize="11" TextTrimming="CharacterEllipsis" Text="{Binding RowPriorities[3].AssignedCatName}" />
+          </StackPanel>
+        </ToggleButton>
 
-            <Border Grid.Column="1" Classes="overlay-panel" Padding="12" Margin="4,0">
-              <StackPanel Spacing="6">
-                <TextBlock Text="Risks" FontWeight="SemiBold" />
-                <TextBlock Text="{Binding RiskSummary}" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding RetiredCount, StringFormat=Retired cats: {0}}" />
-                <TextBlock Text="{Binding Plan.BreedingPool.Count, StringFormat=Breeding pool size: {0}}" />
-                <TextBlock Text="{Binding NaturalSevenSummary}" />
-              </StackPanel>
-            </Border>
-
-            <Border Grid.Column="2" Classes="overlay-panel" Padding="12" Margin="8,0,0,0">
-              <StackPanel Spacing="8">
-                <TextBlock Text="Next Actions" FontWeight="SemiBold" />
-                <TextBlock TextWrapping="Wrap" Text="{Binding NextActionSummary}" />
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <Button Content="Open Breeding"
-                          Command="{Binding SetSectionCommand}"
-                          CommandParameter="Breeding" />
-                  <Button Content="Open Full Roster"
-                          Command="{Binding SetSectionCommand}"
-                          CommandParameter="FullRoster" />
-                </StackPanel>
-              </StackPanel>
-            </Border>
-          </Grid>
-        </StackPanel>
-
-        <StackPanel Spacing="10"
-                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring}">
-          <TextBlock Text="Adventuring Team" FontSize="18" FontWeight="SemiBold" />
-
-          <ItemsControl ItemsSource="{Binding RowPriorities}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                  <TextBlock Width="40" Text="{Binding RowIndex, StringFormat=# {0}}" />
-                  <ComboBox Width="140"
-                            ItemsSource="{Binding DataContext.RowChoiceOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            SelectedItem="{Binding Choice}"
-                            IsEnabled="{Binding DataContext.TeamAutoEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolNot}}" />
-                </StackPanel>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-
-          <DataGrid x:Name="AdventuringGrid"
-                    ItemsSource="{Binding AdventuringTeam}"
-                    AutoGenerateColumns="False"
-                    IsReadOnly="True"
-                    Height="240">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="64" />
-              <DataGridTextColumn Header="Stat Priority" Binding="{Binding Choice}" Width="140" />
-              <DataGridTemplateColumn Header="Name" Width="*">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <TextBlock Text="{Binding Cat.Name}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding Cat.CurrentAverage, StringFormat={}{0:F2}}" Width="100" />
-              <DataGridTextColumn Header="STR C" Binding="{Binding Cat.StrengthCurrent}" Width="62" />
-              <DataGridTextColumn Header="DEX C" Binding="{Binding Cat.DexterityCurrent}" Width="62" />
-              <DataGridTextColumn Header="STA C" Binding="{Binding Cat.StaminaCurrent}" Width="62" />
-              <DataGridTextColumn Header="INT C" Binding="{Binding Cat.IntellectCurrent}" Width="62" />
-              <DataGridTextColumn Header="SPD C" Binding="{Binding Cat.SpeedCurrent}" Width="62" />
-              <DataGridTextColumn Header="CHA C" Binding="{Binding Cat.CharismaCurrent}" Width="62" />
-              <DataGridTextColumn Header="LCK C" Binding="{Binding Cat.LuckCurrent}" Width="62" />
-            </DataGrid.Columns>
-          </DataGrid>
-          <TextBlock Text="Auto-fill uses Available cats; Send to Team pins any non-retired cat into the team." />
-        </StackPanel>
-
-        <StackPanel Spacing="10"
-                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}">
-          <TextBlock Text="Breeding Pool Roster" FontSize="18" FontWeight="SemiBold" />
-          <TextBlock TextWrapping="Wrap"
-                     Text="How this works: Meowdex first picks your top breeders by natural-7 strength, compatibility, and base average. It then recommends partner cats for each top breeder based on breeding compatibility plus how much new natural-7 coverage they can add to the current pool and to that breeder's mask. The table below shows the combined breeding pool (top breeders + recommended partners)." />
-          <TextBlock Classes="muted"
-                     FontSize="11"
-                     Text="{Binding TopCatCount, StringFormat=Top breeders: {0}}"
-                     />
-          <TextBlock Classes="muted"
-                     FontSize="11"
-                     Text="{Binding BackfillsPerMask, StringFormat=Desired partners per top breeder: {0}}"
-                     />
-          <DataGrid x:Name="BreedingPoolGrid"
-                    ItemsSource="{Binding Plan.BreedingPool}"
-                    AutoGenerateColumns="False"
-                    IsReadOnly="True"
-                    Sorting="OnBreedingPoolSorting">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="64" SortMemberPath="Id" />
-              <DataGridTemplateColumn Header="Name" Width="320" SortMemberPath="NameWithId">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Row="0"
-                                 Grid.Column="0"
-                                 Text="{Binding Cat.Name}"
-                                 FontSize="14"
-                                 FontWeight="SemiBold"
-                                 VerticalAlignment="Center" />
-                      <TextBlock Grid.Row="0"
-                                 Grid.Column="1"
-                                 Margin="8,0,0,0"
-                                 HorizontalAlignment="Right"
-                                 VerticalAlignment="Center"
-                                 IsVisible="{Binding Cat.IsRetired}"
-                                 Text="♛"
-                                 FontSize="14"
-                                 Foreground="#F6C84B" />
-                      <TextBlock Grid.Row="1"
-                                 Grid.Column="0"
-                                 Classes="muted"
-                                 FontSize="11"
-                                 Text="{Binding CompatiblePartners, StringFormat=# Partners: {0}}" />
-                      <TextBlock Grid.Row="1"
-                                 Grid.Column="1"
-                                 Classes="muted"
-                                 FontSize="11"
-                                 HorizontalAlignment="Right"
-                                 Text="{Binding CurrentBaseSummary}" />
-                    </Grid>
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="Gender" Width="74" SortMemberPath="GenderSortKey">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Image Classes="identity-icon"
-                           Width="18"
-                           Height="18"
-                           HorizontalAlignment="Center"
-                           Source="{Binding Cat.Gender, Converter={StaticResource GenderIconConverter}}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="Sexuality" Width="86" SortMemberPath="SexualitySortKey">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Image Classes="identity-icon"
-                           Width="18"
-                           Height="18"
-                           HorizontalAlignment="Center"
-                           Source="{Binding Cat.Sexuality, Converter={StaticResource SexualityIconConverter}}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTextColumn Header="STR" Binding="{Binding StrMark}" Width="56" SortMemberPath="StrSortKey" />
-              <DataGridTextColumn Header="DEX" Binding="{Binding DexMark}" Width="56" SortMemberPath="DexSortKey" />
-              <DataGridTextColumn Header="STA" Binding="{Binding StaMark}" Width="56" SortMemberPath="StaSortKey" />
-              <DataGridTextColumn Header="INT" Binding="{Binding IntMark}" Width="56" SortMemberPath="IntSortKey" />
-              <DataGridTextColumn Header="SPD" Binding="{Binding SpdMark}" Width="56" SortMemberPath="SpdSortKey" />
-              <DataGridTextColumn Header="CHA" Binding="{Binding ChaMark}" Width="56" SortMemberPath="ChaSortKey" />
-              <DataGridTextColumn Header="LCK" Binding="{Binding LukMark}" Width="56" SortMemberPath="LukSortKey" />
-              <DataGridTemplateColumn Header="Actions" Width="182" CanUserSort="False">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                      <Button Classes="icon-btn"
-                              ToolTip.Tip="Send to Team"
-                              HorizontalAlignment="Left"
-                              Padding="0"
-                              Tag="{Binding Cat.Id}"
-                              Click="OnSendToTeam">
-                        <Image Width="24"
-                               Height="24"
-                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-team.svg}" />
-                      </Button>
-                      <Button Classes="icon-btn"
-                              ToolTip.Tip="Send to Available"
-                              HorizontalAlignment="Left"
-                              Padding="0"
-                              Tag="{Binding Cat.Id}"
-                              Click="OnRemoveFromBreedingPool">
-                        <Image Width="24"
-                               Height="24"
-                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-available.svg}" />
-                      </Button>
-                    </StackPanel>
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-            </DataGrid.Columns>
-          </DataGrid>
-
-          <Border Classes="overlay-panel" Padding="12">
-            <StackPanel Spacing="10">
-              <TextBlock Text="Top Breeder Partners" FontSize="16" FontWeight="SemiBold" />
-              <TextBlock Classes="muted"
-                         FontSize="11"
-                         Text="{Binding BackfillsPerMask, StringFormat=Partners per top breeder: {0}}" />
-
-              <ItemsControl ItemsSource="{Binding Plan.TopBreederRecommendations}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Border BorderBrush="{StaticResource BorderColor}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="10"
-                            Margin="0,0,0,8">
-                      <StackPanel Spacing="8">
-                        <TextBlock FontWeight="SemiBold"
-                                   Text="{Binding Breeder.Name, StringFormat=Breeder: {0}}" />
-                        <TextBlock Classes="muted"
-                                   FontSize="11"
-                                   Text="{Binding Breeder.Id, StringFormat=ID: #{0}}" />
-
-                        <DataGrid ItemsSource="{Binding Partners}"
-                                  AutoGenerateColumns="False"
-                                  IsReadOnly="True"
-                                  HeadersVisibility="Column"
-                                  CanUserSortColumns="False"
-                                  MinHeight="80">
-                          <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Partner.Id}" Width="64" />
-                            <DataGridTextColumn Header="Partner" Binding="{Binding Partner.Name}" Width="180" />
-                            <DataGridTextColumn Header="Score" Binding="{Binding Score, StringFormat={}{0:F2}}" Width="80" />
-                            <DataGridTextColumn Header="Novel (Pool)" Binding="{Binding NovelPoolMask, Converter={StaticResource MaskConverter}}" Width="130" />
-                            <DataGridTextColumn Header="Novel (Breeder)" Binding="{Binding NovelForBreederMask, Converter={StaticResource MaskConverter}}" Width="140" />
-                          </DataGrid.Columns>
-                        </DataGrid>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-        </StackPanel>
-
-        <StackPanel Spacing="10"
-                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Available}">
-          <TextBlock Text="Available Cats" FontSize="18" FontWeight="SemiBold" />
-          <DataGrid x:Name="GeneralPopulationGrid"
-                    ItemsSource="{Binding Plan.GeneralPopulation}"
-                    AutoGenerateColumns="False"
-                    IsReadOnly="True">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="64" SortMemberPath="Id" />
-              <DataGridTemplateColumn Header="Name" Width="320" SortMemberPath="NameWithId">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
-                      <TextBlock Grid.Row="0"
-                                 Grid.Column="0"
-                                 Text="{Binding Cat.Name}"
-                                 FontSize="14"
-                                 FontWeight="SemiBold"
-                                 VerticalAlignment="Center" />
-                      <TextBlock Grid.Row="0"
-                                 Grid.Column="1"
-                                 Margin="8,0,0,0"
-                                 HorizontalAlignment="Right"
-                                 VerticalAlignment="Center"
-                                 IsVisible="{Binding Cat.IsRetired}"
-                                 Text="♛"
-                                 FontSize="14"
-                                 Foreground="#F6C84B" />
-                      <TextBlock Grid.Row="1"
-                                 Grid.Column="0"
-                                 Classes="muted"
-                                 FontSize="11"
-                                 Text="{Binding CompatiblePartners, StringFormat=# Partners: {0}}" />
-                      <TextBlock Grid.Row="1"
-                                 Grid.Column="1"
-                                 Classes="muted"
-                                 FontSize="11"
-                                 HorizontalAlignment="Right"
-                                 Text="{Binding CurrentBaseSummary}" />
-                    </Grid>
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="Gender" Width="74" SortMemberPath="GenderSortKey">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Image Classes="identity-icon"
-                           Width="18"
-                           Height="18"
-                           HorizontalAlignment="Center"
-                           Source="{Binding Cat.Gender, Converter={StaticResource GenderIconConverter}}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="Sexuality" Width="86" SortMemberPath="SexualitySortKey">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Image Classes="identity-icon"
-                           Width="18"
-                           Height="18"
-                           HorizontalAlignment="Center"
-                           Source="{Binding Cat.Sexuality, Converter={StaticResource SexualityIconConverter}}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTextColumn Header="STR" Binding="{Binding StrMark}" Width="56" SortMemberPath="StrSortKey" />
-              <DataGridTextColumn Header="DEX" Binding="{Binding DexMark}" Width="56" SortMemberPath="DexSortKey" />
-              <DataGridTextColumn Header="STA" Binding="{Binding StaMark}" Width="56" SortMemberPath="StaSortKey" />
-              <DataGridTextColumn Header="INT" Binding="{Binding IntMark}" Width="56" SortMemberPath="IntSortKey" />
-              <DataGridTextColumn Header="SPD" Binding="{Binding SpdMark}" Width="56" SortMemberPath="SpdSortKey" />
-              <DataGridTextColumn Header="CHA" Binding="{Binding ChaMark}" Width="56" SortMemberPath="ChaSortKey" />
-              <DataGridTextColumn Header="LCK" Binding="{Binding LukMark}" Width="56" SortMemberPath="LukSortKey" />
-              <DataGridTemplateColumn Header="Actions" Width="182" CanUserSort="False">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                      <Button Classes="icon-btn"
-                              ToolTip.Tip="Send to Team"
-                              HorizontalAlignment="Left"
-                              Padding="0"
-                              Tag="{Binding Cat.Id}"
-                              Click="OnSendToTeam">
-                        <Image Width="24"
-                               Height="24"
-                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-team.svg}" />
-                      </Button>
-                      <Button Classes="icon-btn"
-                              ToolTip.Tip="Send to Breeding Pool"
-                              HorizontalAlignment="Left"
-                              Padding="0"
-                              Tag="{Binding Cat.Id}"
-                              Click="OnSendToBreedingPool">
-                        <Image Width="24"
-                               Height="24"
-                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-breeding.svg}" />
-                      </Button>
-                    </StackPanel>
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTextColumn Header="STR C" Binding="{Binding Cat.StrengthCurrent}" Width="62" SortMemberPath="Cat.StrengthCurrent" />
-              <DataGridTextColumn Header="STR B" Binding="{Binding Cat.StrengthBase}" Width="62" SortMemberPath="Cat.StrengthBase" />
-              <DataGridTextColumn Header="DEX C" Binding="{Binding Cat.DexterityCurrent}" Width="62" SortMemberPath="Cat.DexterityCurrent" />
-              <DataGridTextColumn Header="DEX B" Binding="{Binding Cat.DexterityBase}" Width="62" SortMemberPath="Cat.DexterityBase" />
-              <DataGridTextColumn Header="STA C" Binding="{Binding Cat.StaminaCurrent}" Width="62" SortMemberPath="Cat.StaminaCurrent" />
-              <DataGridTextColumn Header="STA B" Binding="{Binding Cat.StaminaBase}" Width="62" SortMemberPath="Cat.StaminaBase" />
-              <DataGridTextColumn Header="INT C" Binding="{Binding Cat.IntellectCurrent}" Width="62" SortMemberPath="Cat.IntellectCurrent" />
-              <DataGridTextColumn Header="INT B" Binding="{Binding Cat.IntellectBase}" Width="62" SortMemberPath="Cat.IntellectBase" />
-              <DataGridTextColumn Header="SPD C" Binding="{Binding Cat.SpeedCurrent}" Width="62" SortMemberPath="Cat.SpeedCurrent" />
-              <DataGridTextColumn Header="SPD B" Binding="{Binding Cat.SpeedBase}" Width="62" SortMemberPath="Cat.SpeedBase" />
-              <DataGridTextColumn Header="CHA C" Binding="{Binding Cat.CharismaCurrent}" Width="62" SortMemberPath="Cat.CharismaCurrent" />
-              <DataGridTextColumn Header="CHA B" Binding="{Binding Cat.CharismaBase}" Width="62" SortMemberPath="Cat.CharismaBase" />
-              <DataGridTextColumn Header="LCK C" Binding="{Binding Cat.LuckCurrent}" Width="62" SortMemberPath="Cat.LuckCurrent" />
-              <DataGridTextColumn Header="LCK B" Binding="{Binding Cat.LuckBase}" Width="62" SortMemberPath="Cat.LuckBase" />
-            </DataGrid.Columns>
-          </DataGrid>
-        </StackPanel>
-
-        <StackPanel Spacing="10"
-                    IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=FullRoster}">
-          <TextBlock Text="Full Roster" FontSize="18" FontWeight="SemiBold" />
-          <DataGrid x:Name="FullRosterGrid"
-                    ItemsSource="{Binding Cats}"
-                    AutoGenerateColumns="False"
-                    IsReadOnly="True"
-                    Height="520"
-                    CanUserSortColumns="True"
-                    SelectionMode="Single"
-                    HeadersVisibility="Column"
-                    HorizontalScrollBarVisibility="Auto">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="64" SortMemberPath="Id" />
-              <DataGridTemplateColumn Header="Name" Width="260" SortMemberPath="Name">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Grid ColumnDefinitions="*,Auto">
-                      <TextBlock Text="{Binding Name}" />
-                      <TextBlock Grid.Column="1"
-                                 Margin="8,0,0,0"
-                                 HorizontalAlignment="Right"
-                                 VerticalAlignment="Center"
-                                 IsVisible="{Binding IsRetired}"
-                                 Text="♛"
-                                 FontSize="14"
-                                 Foreground="#F6C84B" />
-                    </Grid>
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="Gender" Width="74" SortMemberPath="Gender">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Image Classes="identity-icon"
-                           Width="18"
-                           Height="18"
-                           HorizontalAlignment="Center"
-                           Source="{Binding Gender, Converter={StaticResource GenderIconConverter}}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTemplateColumn Header="Sexuality" Width="86" SortMemberPath="Sexuality">
-                <DataGridTemplateColumn.CellTemplate>
-                  <DataTemplate>
-                    <Image Classes="identity-icon"
-                           Width="18"
-                           Height="18"
-                           HorizontalAlignment="Center"
-                           Source="{Binding Sexuality, Converter={StaticResource SexualityIconConverter}}" />
-                  </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-              </DataGridTemplateColumn>
-              <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding CurrentAverage, StringFormat={}{0:F2}}" Width="98" SortMemberPath="CurrentAverage" />
-              <DataGridTextColumn Header="Base &#x03BC;" Binding="{Binding BaseAverage, StringFormat={}{0:F2}}" Width="84" SortMemberPath="BaseAverage" />
-              <DataGridTextColumn Header="STR C" Binding="{Binding StrengthCurrent}" Width="62" SortMemberPath="StrengthCurrent" />
-              <DataGridTextColumn Header="STR B" Binding="{Binding StrengthBase}" Width="62" SortMemberPath="StrengthBase" />
-              <DataGridTextColumn Header="DEX C" Binding="{Binding DexterityCurrent}" Width="62" SortMemberPath="DexterityCurrent" />
-              <DataGridTextColumn Header="DEX B" Binding="{Binding DexterityBase}" Width="62" SortMemberPath="DexterityBase" />
-              <DataGridTextColumn Header="STA C" Binding="{Binding StaminaCurrent}" Width="62" SortMemberPath="StaminaCurrent" />
-              <DataGridTextColumn Header="STA B" Binding="{Binding StaminaBase}" Width="62" SortMemberPath="StaminaBase" />
-              <DataGridTextColumn Header="INT C" Binding="{Binding IntellectCurrent}" Width="62" SortMemberPath="IntellectCurrent" />
-              <DataGridTextColumn Header="INT B" Binding="{Binding IntellectBase}" Width="62" SortMemberPath="IntellectBase" />
-              <DataGridTextColumn Header="SPD C" Binding="{Binding SpeedCurrent}" Width="62" SortMemberPath="SpeedCurrent" />
-              <DataGridTextColumn Header="SPD B" Binding="{Binding SpeedBase}" Width="62" SortMemberPath="SpeedBase" />
-              <DataGridTextColumn Header="CHA C" Binding="{Binding CharismaCurrent}" Width="62" SortMemberPath="CharismaCurrent" />
-              <DataGridTextColumn Header="CHA B" Binding="{Binding CharismaBase}" Width="62" SortMemberPath="CharismaBase" />
-              <DataGridTextColumn Header="LCK C" Binding="{Binding LuckCurrent}" Width="62" SortMemberPath="LuckCurrent" />
-              <DataGridTextColumn Header="LCK B" Binding="{Binding LuckBase}" Width="62" SortMemberPath="LuckBase" />
-            </DataGrid.Columns>
-          </DataGrid>
-        </StackPanel>
+        <Button Height="28"
+                Padding="8,2"
+                FontSize="11"
+                Content="Clear"
+                Click="OnClearTeam" />
+        <Button Classes="primary"
+                Height="28"
+                Padding="8,2"
+                FontSize="11"
+                Content="Retire"
+                Click="OnRetireTeam" />
       </StackPanel>
-    </StackPanel>
+    </Border>
+
+    <ScrollViewer Grid.Row="2">
+      <StackPanel Spacing="16" Margin="24">
+        <sections:SnapshotSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot}" />
+        <sections:AdventuringSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring}" />
+        <sections:BreedingSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}" />
+        <sections:AvailableSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Available}" />
+        <sections:FullRosterSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=FullRoster}" />
+      </StackPanel>
     </ScrollViewer>
   </Grid>
 </UserControl>
-
-
-
-
-
-

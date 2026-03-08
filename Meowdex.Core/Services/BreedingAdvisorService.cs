@@ -65,6 +65,8 @@ public sealed class BreedingAdvisorService
                 cat,
                 FormatMask(cat.SevenMask),
                 poolCompatibleCounts[cat.Id],
+                true,
+                false,
                 topCats.Contains(cat)
                     ? "Top-mask priority"
                     : partnerReasons.GetValueOrDefault(cat.Id, "Top-breeder partner recommendation")))
@@ -75,6 +77,8 @@ public sealed class BreedingAdvisorService
             .OrderByDescending(cat => cat.CurrentAverage)
             .Select(cat => new GeneralPopulationEntry(
                 cat,
+                false,
+                false,
                 compatibleCounts[cat.Id],
                 cat.IsRetired
                     ? "Retired"
@@ -255,12 +259,15 @@ public sealed record BreedingPoolEntry(
     CatProfile Cat,
     string SevenMask,
     int CompatiblePartners,
+    bool CanonicalInBreedingPool,
+    bool IsInAdventuringTeam,
     string Reason)
 {
     public string NameWithId => Cat.Name;
     public int Id => Cat.Id;
     public string CurrentBaseSummary =>
         string.Create(CultureInfo.InvariantCulture, $"{Cat.CurrentAverage:F2} / {Cat.BaseAverage:F2}");
+    public bool ShowTeamIcon => !Cat.IsRetired && IsInAdventuringTeam;
     public string GenderSortKey => Cat.Gender.ToString();
     public string SexualitySortKey => Cat.Sexuality switch
     {
@@ -309,13 +316,17 @@ public sealed record BreedingPoolEntry(
 
 public sealed record GeneralPopulationEntry(
     CatProfile Cat,
+    bool CanonicalInBreedingPool,
+    bool IsInAdventuringTeam,
     int CompatiblePartners,
-    string Reason)
+    string Reason,
+    bool CurrentlyInBreedingPool = false)
 {
     public string NameWithId => Cat.Name;
     public int Id => Cat.Id;
     public string CurrentBaseSummary =>
         string.Create(CultureInfo.InvariantCulture, $"{Cat.CurrentAverage:F2} / {Cat.BaseAverage:F2}");
+    public bool ShowTeamIcon => !Cat.IsRetired && IsInAdventuringTeam;
     public string GenderSortKey => Cat.Gender.ToString();
     public string SexualitySortKey => Cat.Sexuality switch
     {

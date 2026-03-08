@@ -1,0 +1,111 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Meowdex.Desktop.Views.Sections.AdventuringSectionView">
+  <StackPanel Spacing="10">
+    <TextBlock Text="Adventuring Team" FontSize="18" FontWeight="SemiBold" />
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+      <CheckBox Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Content="Auto" IsChecked="{Binding TeamAutoEnabled}" />
+      <Button Grid.Row="0" Grid.Column="1" Content="Reset Full Auto" Click="OnResetTeamAuto" />
+      <Button Grid.Row="0" Grid.Column="2" Content="Clear Team" Click="OnClearTeam" />
+      <Button Grid.Row="0" Grid.Column="3" Classes="primary" Content="Retire Team" Click="OnRetireTeam" />
+      <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Classes="muted" Text="Use Send to Team on any cat row to pin cats to slots. Uncheck Auto to set per-slot stat priorities." TextWrapping="Wrap" />
+    </Grid>
+
+    <ItemsControl ItemsSource="{Binding RowPriorities}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <TextBlock Width="40" Text="{Binding RowIndex, StringFormat=# {0}}" />
+            <ComboBox Width="140"
+                      ItemsSource="{Binding DataContext.RowChoiceOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                      SelectedItem="{Binding Choice}"
+                      IsEnabled="{Binding DataContext.TeamAutoEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolNot}}" />
+            <TextBlock Classes="muted" VerticalAlignment="Center" Text="{Binding AssignedCatName}" />
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <DataGrid x:Name="AdventuringGrid"
+              Classes="full-roster-grid"
+              ItemsSource="{Binding AdventuringTeam}"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              Height="240">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" Binding="{Binding Cat.Id}" Width="64" />
+        <DataGridTextColumn Header="Stat Priority" Binding="{Binding Choice}" Width="140" />
+        <DataGridTemplateColumn Width="*">
+          <DataGridTemplateColumn.Header>
+            <TextBlock Text="Feline Specimen"
+                       HorizontalAlignment="Left"
+                       TextAlignment="Left" />
+          </DataGridTemplateColumn.Header>
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Cat.Name}" />
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Current &#x03BC;" Binding="{Binding Cat.CurrentAverage, StringFormat={}{0:F2}}" Width="100" />
+        <DataGridTextColumn Binding="{Binding Cat.StrengthCurrent}" Width="72">
+          <DataGridTextColumn.Header>
+            <StackPanel Spacing="1">
+              <TextBlock Text="STR" HorizontalAlignment="Center" />
+              <TextBlock Text="Current" Classes="muted" FontSize="10" HorizontalAlignment="Center" />
+            </StackPanel>
+          </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+        <DataGridTextColumn Binding="{Binding Cat.DexterityCurrent}" Width="72">
+          <DataGridTextColumn.Header>
+            <StackPanel Spacing="1">
+              <TextBlock Text="DEX" HorizontalAlignment="Center" />
+              <TextBlock Text="Current" Classes="muted" FontSize="10" HorizontalAlignment="Center" />
+            </StackPanel>
+          </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+        <DataGridTextColumn Binding="{Binding Cat.StaminaCurrent}" Width="72">
+          <DataGridTextColumn.Header>
+            <StackPanel Spacing="1">
+              <TextBlock Text="STA" HorizontalAlignment="Center" />
+              <TextBlock Text="Current" Classes="muted" FontSize="10" HorizontalAlignment="Center" />
+            </StackPanel>
+          </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+        <DataGridTextColumn Binding="{Binding Cat.IntellectCurrent}" Width="72">
+          <DataGridTextColumn.Header>
+            <StackPanel Spacing="1">
+              <TextBlock Text="INT" HorizontalAlignment="Center" />
+              <TextBlock Text="Current" Classes="muted" FontSize="10" HorizontalAlignment="Center" />
+            </StackPanel>
+          </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+        <DataGridTextColumn Binding="{Binding Cat.SpeedCurrent}" Width="72">
+          <DataGridTextColumn.Header>
+            <StackPanel Spacing="1">
+              <TextBlock Text="SPD" HorizontalAlignment="Center" />
+              <TextBlock Text="Current" Classes="muted" FontSize="10" HorizontalAlignment="Center" />
+            </StackPanel>
+          </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+        <DataGridTextColumn Binding="{Binding Cat.CharismaCurrent}" Width="72">
+          <DataGridTextColumn.Header>
+            <StackPanel Spacing="1">
+              <TextBlock Text="CHA" HorizontalAlignment="Center" />
+              <TextBlock Text="Current" Classes="muted" FontSize="10" HorizontalAlignment="Center" />
+            </StackPanel>
+          </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+        <DataGridTextColumn Binding="{Binding Cat.LuckCurrent}" Width="72">
+          <DataGridTextColumn.Header>
+            <StackPanel Spacing="1">
+              <TextBlock Text="LCK" HorizontalAlignment="Center" />
+              <TextBlock Text="Current" Classes="muted" FontSize="10" HorizontalAlignment="Center" />
+            </StackPanel>
+          </DataGridTextColumn.Header>
+        </DataGridTextColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+    <TextBlock Text="Auto-fill uses Available cats; Send to Team pins any non-retired cat into the team." />
+  </StackPanel>
+</UserControl>

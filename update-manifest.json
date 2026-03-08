@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "releaseNotes": "v0.1.0 | QoL Improvements",
+  "releaseNotes": "v0.1.0 | Major QoL Improvements and UI Refactor",
   "downloads": {
     "win-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.0/Meowdex.Desktop-win-x64-Release.zip",
     "linux-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.0/Meowdex.Desktop-linux-x64-Release.zip",

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Meowdex.Desktop.ViewModels;
 
 namespace Meowdex.Desktop.Views;
 
@@ -9,6 +10,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        AddHandler(InputElement.KeyDownEvent, OnWindowKeyDown, RoutingStrategies.Tunnel);
 
 #if DEBUG
         DebugSelectionHud.IsVisible = true;
@@ -49,4 +51,15 @@ public sealed partial class MainWindow : Window
         return control.GetType().Name;
     }
 #endif
+
+    private void OnWindowKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Escape || DataContext is not MainViewModel vm || !vm.OverlayHost.IsOpen)
+        {
+            return;
+        }
+
+        vm.OverlayHost.Close();
+        e.Handled = true;
+    }
 }

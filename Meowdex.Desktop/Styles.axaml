@@ -17,6 +17,8 @@
     <SolidColorBrush x:Key="SurfaceBackground" Color="#313338" />
     <SolidColorBrush x:Key="SurfaceAltBackground" Color="#383A40" />
     <SolidColorBrush x:Key="SurfaceRowAltBackground" Color="#3A3C42" />
+    <SolidColorBrush x:Key="StatPairCurrentBackground" Color="#4A4D54" />
+    <SolidColorBrush x:Key="StatPairBaseBackground" Color="#43464D" />
     <SolidColorBrush x:Key="BorderColor" Color="#3F4147" />
     <SolidColorBrush x:Key="TextPrimary" Color="#E6E8EA" />
     <SolidColorBrush x:Key="TextMuted" Color="#B5BAC1" />
@@ -104,6 +106,24 @@
   <Style Selector="DataGridColumnHeader">
     <Setter Property="Background" Value="{StaticResource SurfaceAltBackground}" />
     <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="DataGrid.full-roster-grid DataGridColumnHeader">
+    <Setter Property="Padding" Value="4,2" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+  </Style>
+
+  <Style Selector="Border.stat-pair-current">
+    <Setter Property="Background" Value="{StaticResource StatPairCurrentBackground}" />
+  </Style>
+
+  <Style Selector="Border.stat-pair-base">
+    <Setter Property="Background" Value="{StaticResource StatPairBaseBackground}" />
   </Style>
 
   <Style Selector="Button">
@@ -118,6 +138,12 @@
 
   <Style Selector="Button.primary">
     <Setter Property="Background" Value="{StaticResource AccentStrong}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <Style Selector="Button.add-cat-btn">
+    <Setter Property="Background" Value="#4E8F5A" />
+    <Setter Property="BorderBrush" Value="#5FAE6D" />
     <Setter Property="Foreground" Value="White" />
   </Style>
 

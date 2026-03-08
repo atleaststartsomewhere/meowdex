@@ -5,6 +5,7 @@
         Height="800"
         MinWidth="960"
         MinHeight="640"
+        Icon="avares://Meowdex.Desktop/Assets/Icons/app.ico"
         Title="Meowdex">
   <Grid>
     <ContentControl Content="{Binding CurrentViewModel}" />

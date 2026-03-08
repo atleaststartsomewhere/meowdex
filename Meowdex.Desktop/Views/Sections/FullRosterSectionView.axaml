@@ -1,0 +1,275 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Meowdex.Desktop.Views.Sections.FullRosterSectionView">
+  <Grid>
+    <StackPanel Spacing="10">
+<TextBlock Text="Full Roster" FontSize="18" FontWeight="SemiBold" />
+          <DataGrid x:Name="FullRosterGrid"
+                    Classes="full-roster-grid"
+                    ItemsSource="{Binding FullRosterEntries}"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    Height="520"
+                    CanUserSortColumns="True"
+                    SelectionMode="Single"
+                    HeadersVisibility="Column"
+                    HorizontalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="64" SortMemberPath="Id" />
+              <DataGridTemplateColumn Width="320" SortMemberPath="NameWithId">
+                <DataGridTemplateColumn.Header>
+                  <Grid RowDefinitions="Auto,*" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <TextBlock Grid.Row="0"
+                               Text="Feline Specimen"
+                               HorizontalAlignment="Left"
+                               TextAlignment="Left" />
+                    <TextBlock Grid.Row="1"
+                               Classes="muted"
+                               FontSize="10"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Bottom"
+                               Text="Current/Base (μ)" />
+                  </Grid>
+                </DataGridTemplateColumn.Header>
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
+                      <Grid Grid.RowSpan="2" Grid.Column="0" Width="16" Height="16" VerticalAlignment="Center">
+                        <Image Width="16"
+                               Height="16"
+                               IsVisible="{Binding CanonicalInBreedingPool}"
+                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-breeding.svg}" />
+                        <Image Width="16"
+                               Height="16"
+                               IsVisible="{Binding CanonicalInBreedingPool, Converter={StaticResource BoolNot}}"
+                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-available.svg}" />
+                      </Grid>
+                      <TextBlock Grid.Row="0"
+                                 Grid.Column="1"
+                                 Text="{Binding Cat.Name}"
+                                 FontSize="14"
+                                 FontWeight="SemiBold"
+                                 VerticalAlignment="Center" />
+                      <Image Grid.Row="0"
+                             Grid.Column="2"
+                             Margin="8,0,0,0"
+                             Width="14"
+                             Height="14"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Center"
+                             IsVisible="{Binding Cat.IsRetired}"
+                             Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/crown.svg}" />
+                      <Image Grid.Row="0"
+                             Grid.Column="2"
+                             Margin="8,0,0,0"
+                             Width="14"
+                             Height="14"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Center"
+                             IsVisible="{Binding ShowTeamIcon}"
+                             Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-team.svg}" />
+                      <TextBlock Grid.Row="1"
+                                 Grid.Column="1"
+                                 Classes="muted"
+                                 FontSize="11"
+                                 Text="{Binding CompatiblePartners, StringFormat=# Partners: {0}}" />
+                      <TextBlock Grid.Row="1"
+                                 Grid.Column="2"
+                                 Classes="muted"
+                                 FontSize="11"
+                                 HorizontalAlignment="Right"
+                                 Text="{Binding CurrentBaseSummary}" />
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Width="60" CanUserSort="False">
+                <DataGridTemplateColumn.Header>
+                  <Grid Width="52"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Stretch">
+                    <Image Width="20"
+                           Height="20"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/cat-location.svg}" />
+                  </Grid>
+                </DataGridTemplateColumn.Header>
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid HorizontalAlignment="Center">
+                      <Image Width="16"
+                             Height="16"
+                             IsVisible="{Binding CurrentlyInBreedingPool}"
+                             Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-breeding.svg}" />
+                      <Image Width="16"
+                             Height="16"
+                             IsVisible="{Binding CurrentlyInBreedingPool, Converter={StaticResource BoolNot}}"
+                             Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-available.svg}" />
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="Gender" Width="90" SortMemberPath="GenderSortKey">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Cat.Gender, Converter={StaticResource GenderIconConverter}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="Sexuality" Width="102" SortMemberPath="SexualitySortKey">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Image Classes="identity-icon"
+                           Width="18"
+                           Height="18"
+                           HorizontalAlignment="Center"
+                           Source="{Binding Cat.Sexuality, Converter={StaticResource SexualityIconConverter}}" />
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="STR" Binding="{Binding StrMark}" Width="64" SortMemberPath="StrSortKey" />
+              <DataGridTextColumn Header="DEX" Binding="{Binding DexMark}" Width="64" SortMemberPath="DexSortKey" />
+              <DataGridTextColumn Header="STA" Binding="{Binding StaMark}" Width="64" SortMemberPath="StaSortKey" />
+              <DataGridTextColumn Header="INT" Binding="{Binding IntMark}" Width="64" SortMemberPath="IntSortKey" />
+              <DataGridTextColumn Header="SPD" Binding="{Binding SpdMark}" Width="64" SortMemberPath="SpdSortKey" />
+              <DataGridTextColumn Header="CHA" Binding="{Binding ChaMark}" Width="64" SortMemberPath="ChaSortKey" />
+              <DataGridTextColumn Header="LCK" Binding="{Binding LukMark}" Width="64" SortMemberPath="LukSortKey" />
+              <DataGridTemplateColumn Header="Actions" Width="90" CanUserSort="False">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Button Classes="icon-btn"
+                            ToolTip.Tip="Send to Team"
+                            HorizontalAlignment="Left"
+                            Padding="0"
+                            Tag="{Binding Cat.Id}"
+                            Click="OnSendToTeam">
+                      <Image Width="24"
+                             Height="24"
+                             Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-team.svg}" />
+                    </Button>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="STR" Width="96" SortMemberPath="Cat.StrengthCurrent">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,*">
+                      <Border Grid.Column="0" Classes="stat-pair-current">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.StrengthCurrent}" />
+                      </Border>
+                      <Border Grid.Column="1" Classes="stat-pair-base">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.StrengthBase}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="DEX" Width="96" SortMemberPath="Cat.DexterityCurrent">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,*">
+                      <Border Grid.Column="0" Classes="stat-pair-current">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.DexterityCurrent}" />
+                      </Border>
+                      <Border Grid.Column="1" Classes="stat-pair-base">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.DexterityBase}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="STA" Width="96" SortMemberPath="Cat.StaminaCurrent">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,*">
+                      <Border Grid.Column="0" Classes="stat-pair-current">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.StaminaCurrent}" />
+                      </Border>
+                      <Border Grid.Column="1" Classes="stat-pair-base">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.StaminaBase}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="INT" Width="96" SortMemberPath="Cat.IntellectCurrent">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,*">
+                      <Border Grid.Column="0" Classes="stat-pair-current">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.IntellectCurrent}" />
+                      </Border>
+                      <Border Grid.Column="1" Classes="stat-pair-base">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.IntellectBase}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="SPD" Width="96" SortMemberPath="Cat.SpeedCurrent">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,*">
+                      <Border Grid.Column="0" Classes="stat-pair-current">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.SpeedCurrent}" />
+                      </Border>
+                      <Border Grid.Column="1" Classes="stat-pair-base">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.SpeedBase}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="CHA" Width="96" SortMemberPath="Cat.CharismaCurrent">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,*">
+                      <Border Grid.Column="0" Classes="stat-pair-current">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.CharismaCurrent}" />
+                      </Border>
+                      <Border Grid.Column="1" Classes="stat-pair-base">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.CharismaBase}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="LCK" Width="96" SortMemberPath="Cat.LuckCurrent">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,*">
+                      <Border Grid.Column="0" Classes="stat-pair-current">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.LuckCurrent}" />
+                      </Border>
+                      <Border Grid.Column="1" Classes="stat-pair-base">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Cat.LuckBase}" />
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+    </StackPanel>
+
+    <Border x:Name="TeamToast"
+            IsVisible="False"
+            ZIndex="1100"
+            Background="#CC111111"
+            CornerRadius="10"
+            Padding="12,8"
+            Margin="0,0,16,16"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom">
+      <TextBlock x:Name="TeamToastText"
+                 Foreground="White"
+                 TextWrapping="Wrap"
+                 MaxWidth="360" />
+    </Border>
+  </Grid>
+</UserControl>

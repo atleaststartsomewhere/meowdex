@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 28" aria-hidden="true">
+  <g fill="#080808">
+
+    <!-- cat ears -->
+    <polygon points="7,6 9,0 12,6"/>
+    <polygon points="12,6 15,0 17,6"/>
+
+    <!-- pin body -->
+    <path d="
+      M12 4
+      C6.8 4 4 7.5 4 11
+      C4 16 12 26 12 26
+      C12 26 20 16 20 11
+      C20 7.5 17.2 4 12 4
+      Z
+    "/>
+
+  </g>
+
+  <!-- face -->
+  <g fill="white">
+    <circle cx="10" cy="11" r="1.1"/>
+    <circle cx="14" cy="11" r="1.1"/>
+    <circle cx="12" cy="14" r="0.9"/>
+  </g>
+</svg>
