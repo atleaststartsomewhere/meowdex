@@ -113,7 +113,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                      <Button Classes="icon-btn"
+                      <Button Classes="icon-btn row-action-btn"
                               ToolTip.Tip="Send to Team"
                               HorizontalAlignment="Left"
                               Padding="0"
@@ -123,7 +123,7 @@
                                Height="24"
                                Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-team.svg}" />
                       </Button>
-                      <Button Classes="icon-btn"
+                      <Button Classes="icon-btn row-action-btn"
                               ToolTip.Tip="Send to Available"
                               HorizontalAlignment="Left"
                               Padding="0"

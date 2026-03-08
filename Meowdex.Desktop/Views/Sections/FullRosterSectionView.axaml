@@ -139,19 +139,43 @@
               <DataGridTextColumn Header="SPD" Binding="{Binding SpdMark}" Width="64" SortMemberPath="SpdSortKey" />
               <DataGridTextColumn Header="CHA" Binding="{Binding ChaMark}" Width="64" SortMemberPath="ChaSortKey" />
               <DataGridTextColumn Header="LCK" Binding="{Binding LukMark}" Width="64" SortMemberPath="LukSortKey" />
-              <DataGridTemplateColumn Header="Actions" Width="90" CanUserSort="False">
+              <DataGridTemplateColumn Header="Actions" Width="182" CanUserSort="False">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <Button Classes="icon-btn"
-                            ToolTip.Tip="Send to Team"
-                            HorizontalAlignment="Left"
-                            Padding="0"
-                            Tag="{Binding Cat.Id}"
-                            Click="OnSendToTeam">
-                      <Image Width="24"
-                             Height="24"
-                             Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-team.svg}" />
-                    </Button>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Button Classes="icon-btn row-action-btn"
+                              ToolTip.Tip="Send to Team"
+                              HorizontalAlignment="Left"
+                              Padding="0"
+                              Tag="{Binding Cat.Id}"
+                              Click="OnSendToTeam">
+                        <Image Width="24"
+                               Height="24"
+                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-team.svg}" />
+                      </Button>
+                      <Button Classes="icon-btn row-action-btn"
+                              ToolTip.Tip="Send to Breeding Pool"
+                              HorizontalAlignment="Left"
+                              Padding="0"
+                              Tag="{Binding Cat.Id}"
+                              IsVisible="{Binding CurrentlyInBreedingPool, Converter={StaticResource BoolNot}}"
+                              Click="OnSendToBreedingPool">
+                        <Image Width="24"
+                               Height="24"
+                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-breeding.svg}" />
+                      </Button>
+                      <Button Classes="icon-btn row-action-btn"
+                              ToolTip.Tip="Send to Available"
+                              HorizontalAlignment="Left"
+                              Padding="0"
+                              Tag="{Binding Cat.Id}"
+                              IsVisible="{Binding CurrentlyInBreedingPool}"
+                              Click="OnRemoveFromBreedingPool">
+                        <Image Width="24"
+                               Height="24"
+                               Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/send-to-available.svg}" />
+                      </Button>
+                    </StackPanel>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>

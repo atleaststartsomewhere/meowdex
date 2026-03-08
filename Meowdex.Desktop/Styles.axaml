@@ -142,8 +142,8 @@
   </Style>
 
   <Style Selector="Button.add-cat-btn">
-    <Setter Property="Background" Value="#4E8F5A" />
-    <Setter Property="BorderBrush" Value="#5FAE6D" />
+    <Setter Property="Background" Value="#35465E" />
+    <Setter Property="BorderBrush" Value="#4A5F7C" />
     <Setter Property="Foreground" Value="White" />
   </Style>
 
@@ -239,6 +239,12 @@
   <Style Selector="ToggleButton.nav-icon-btn, Button.nav-icon-btn">
     <Setter Property="MinWidth" Value="70" />
     <Setter Property="Width" Value="70" />
+  </Style>
+
+  <Style Selector="Button.nav-btn.add-cat-btn">
+    <Setter Property="Background" Value="#35465E" />
+    <Setter Property="BorderBrush" Value="#4A5F7C" />
+    <Setter Property="Foreground" Value="White" />
   </Style>
 
   <Style Selector="ToggleButton.nav-icon-btn Image.menu-icon, Button.nav-icon-btn Image.menu-icon">

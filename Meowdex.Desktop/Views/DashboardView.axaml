@@ -9,7 +9,7 @@
             BorderThickness="0,0,0,1"
             Padding="12,2"
             ZIndex="10">
-      <Grid ColumnDefinitions="Auto,*,Auto" MinHeight="74">
+      <Grid ColumnDefinitions="Auto,*" MinHeight="74">
         <StackPanel Grid.Column="0"
                     Margin="0,0,14,0"
                     Orientation="Horizontal"
@@ -35,7 +35,7 @@
                     Orientation="Horizontal"
                     Spacing="6"
                     VerticalAlignment="Stretch"
-                    HorizontalAlignment="Center"> 
+                    HorizontalAlignment="Right"> 
           <ToggleButton Classes="tab-tracker nav-icon-btn"
                         IsChecked="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring, Mode=OneWay}"
                         Command="{Binding SetSectionCommand}"
@@ -74,12 +74,10 @@
             <Image Classes="menu-icon"
                    Source="{SvgImage avares://Meowdex.Desktop/Assets/Icons/add-cat.svg}" />
           </Button>
+          <Button Classes="icon-btn"
+                  Content="&#x2699;"
+                  Click="OnSettings" />
         </StackPanel>
-
-        <Button Grid.Column="2"
-                Classes="icon-btn"
-                Content="&#x2699;"
-                Click="OnSettings" />
       </Grid>
     </Border>
 
@@ -153,11 +151,21 @@
 
     <ScrollViewer Grid.Row="2">
       <StackPanel Spacing="16" Margin="24">
-        <sections:SnapshotSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot}" />
-        <sections:AdventuringSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring}" />
-        <sections:BreedingSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}" />
-        <sections:AvailableSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Available}" />
-        <sections:FullRosterSectionView IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=FullRoster}" />
+        <sections:SnapshotSectionView
+            IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot}"
+            IsHitTestVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Snapshot}" />
+        <sections:AdventuringSectionView
+            IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring}"
+            IsHitTestVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Adventuring}" />
+        <sections:BreedingSectionView
+            IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}"
+            IsHitTestVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Breeding}" />
+        <sections:AvailableSectionView
+            IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Available}"
+            IsHitTestVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=Available}" />
+        <sections:FullRosterSectionView
+            IsVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=FullRoster}"
+            IsHitTestVisible="{Binding ActiveSection, Converter={StaticResource EqualsConverter}, ConverterParameter=FullRoster}" />
       </StackPanel>
     </ScrollViewer>
   </Grid>

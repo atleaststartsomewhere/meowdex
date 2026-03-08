@@ -50,6 +50,24 @@ public sealed partial class FullRosterSectionView : UserControl
         e.Handled = true;
     }
 
+    private void OnSendToBreedingPool(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is DashboardViewModel vm && sender is Button button && button.Tag is int catId)
+        {
+            vm.SendToBreedingPool(catId);
+            e.Handled = true;
+        }
+    }
+
+    private void OnRemoveFromBreedingPool(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is DashboardViewModel vm && sender is Button button && button.Tag is int catId)
+        {
+            vm.RemoveFromBreedingPool(catId);
+            e.Handled = true;
+        }
+    }
+
     private async void OnGridRowPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (_openingEdit || DataContext is not DashboardViewModel vm || e.Source is not Control source)

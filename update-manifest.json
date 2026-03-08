@@ -1,10 +1,10 @@
 {
-  "version": "0.1.0",
-  "releaseNotes": "v0.1.0 | Major QoL Improvements and UI Refactor",
+  "version": "0.1.1",
+  "releaseNotes": "v0.1.1 | Hotfix",
   "downloads": {
-    "win-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.0/Meowdex.Desktop-win-x64-Release.zip",
-    "linux-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.0/Meowdex.Desktop-linux-x64-Release.zip",
-    "osx-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.0/Meowdex.Desktop-osx-x64-Release.zip",
-    "osx-arm64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.0/Meowdex.Desktop-osx-arm64-Release.zip"
+    "win-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.1/Meowdex.Desktop-win-x64-Release.zip",
+    "linux-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.1/Meowdex.Desktop-linux-x64-Release.zip",
+    "osx-x64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.1/Meowdex.Desktop-osx-x64-Release.zip",
+    "osx-arm64": "https://github.com/atleaststartsomewhere/meowdex/releases/download/v0.1.1/Meowdex.Desktop-osx-arm64-Release.zip"
   }
 }
